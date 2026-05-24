@@ -1,5 +1,5 @@
 import type { AxiosError } from 'axios'
-import type { ProblemDetails } from '@maksit/webui-contracts'
+import type { ProblemDetails } from '@maks-it.com/webui-contracts'
 import { formatProblemDetailsMessage } from './problemDetails'
 
 /** Shows toast(s) for problem+json and 401 responses. */

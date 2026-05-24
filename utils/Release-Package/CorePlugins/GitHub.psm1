@@ -46,6 +46,32 @@ function Get-GitHubRepositoryInternal {
     throw "Could not parse GitHub repo from source: $repoSource. Configure plugins[].repository with 'owner/repo' or a GitHub URL."
 }
 
+function Get-ChangelogVersionHeaderPatternInternal {
+    # Keep a Changelog: ## [1.0.0] - 2026-05-24, bare ## 1.0.0 - 2026-05-24, or legacy ## v1.0.0
+    return '(?m)^##\s+(?:\[(\d+\.\d+\.\d+)\]|v(\d+\.\d+\.\d+)|(\d+\.\d+\.\d+)(?:\s*-\s*\d{4}-\d{2}-\d{2})?\s*$)'
+}
+
+function Get-LatestChangelogVersionInternal {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ReleaseNotesContent
+    )
+
+    $match = [regex]::Match($ReleaseNotesContent, (Get-ChangelogVersionHeaderPatternInternal))
+    if (-not $match.Success) {
+        return $null
+    }
+
+    foreach ($groupIndex in 1..3) {
+        $version = $match.Groups[$groupIndex].Value
+        if (-not [string]::IsNullOrEmpty($version)) {
+            return $version
+        }
+    }
+
+    return $null
+}
+
 function Get-ReleaseNotesInternal {
     param(
         [Parameter(Mandatory = $true)]
@@ -61,11 +87,11 @@ function Get-ReleaseNotesInternal {
     }
 
     $releaseNotesContent = Get-Content $ReleaseNotesFile -Raw
-    if ($releaseNotesContent -notmatch '##\s+v(\d+\.\d+\.\d+)') {
+    $releaseNotesVersion = Get-LatestChangelogVersionInternal -ReleaseNotesContent $releaseNotesContent
+    if ([string]::IsNullOrWhiteSpace($releaseNotesVersion)) {
         throw "No version entry found in the configured release notes source."
     }
 
-    $releaseNotesVersion = $Matches[1]
     if ($releaseNotesVersion -ne $Version) {
         throw "Project version ($Version) does not match the latest release notes version ($releaseNotesVersion)."
     }
@@ -73,7 +99,9 @@ function Get-ReleaseNotesInternal {
     Write-Log -Level "OK" -Message "  Release notes version matches: v$releaseNotesVersion"
 
     Write-Log -Level "STEP" -Message "Extracting release notes..."
-    $pattern = "(?ms)^##\s+v$([regex]::Escape($Version))\b.*?(?=^##\s+v\d+\.\d+\.\d+|\Z)"
+    $escapedVersion = [regex]::Escape($Version)
+    $nextHeaderPattern = '(?m)^##\s+(?:\[\d+\.\d+\.\d+\]|v\d+\.\d+\.\d+|\d+\.\d+\.\d+(?:\s*-\s*\d{4}-\d{2}-\d{2})?\s*$)'
+    $pattern = "(?ms)^##\s+(?:\[$escapedVersion\]|v$escapedVersion|$escapedVersion(?:\s*-\s*\d{4}-\d{2}-\d{2})?).*?(?=$nextHeaderPattern|\Z)"
     $match = [regex]::Match($releaseNotesContent, $pattern)
 
     if (-not $match.Success) {
@@ -133,8 +161,17 @@ function Invoke-Plugin {
         }
     }
 
+    $requireReleaseAssets = $true
+    if ($null -ne $pluginSettings.requireReleaseAssets) {
+        $requireReleaseAssets = [bool]$pluginSettings.requireReleaseAssets
+    }
+
+    if ($releaseAssetPaths.Count -eq 0 -and $requireReleaseAssets) {
+        throw "GitHub release requires at least one prepared release asset (set requireReleaseAssets: false for notes-only npm releases)."
+    }
+
     if ($releaseAssetPaths.Count -eq 0) {
-        throw "GitHub release requires at least one prepared release asset."
+        Write-Log -Level "INFO" -Message "  Notes-only GitHub release (requireReleaseAssets: false)."
     }
 
     $repo = Get-GitHubRepositoryInternal -ConfiguredRepository $configuredRepository

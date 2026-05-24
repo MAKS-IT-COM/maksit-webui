@@ -1,15 +1,15 @@
-# Consuming @maksit/webui-* in Certs UI / Vault
+# Consuming @maks-it.com/webui-* in Certs UI / Vault
 
 Install:
 
 ```bash
-npm install @maksit/webui-contracts @maksit/webui-core @maksit/webui-components
+npm install @maks-it.com/webui-contracts @maks-it.com/webui-core @maks-it.com/webui-components
 ```
 
 Wrap the app:
 
 ```tsx
-import { WebUiProvider, Loader, Authorization } from '@maksit/webui-components'
+import { WebUiProvider, Loader, Authorization } from '@maks-it.com/webui-components'
 
 <WebUiProvider
   api={{
@@ -43,5 +43,5 @@ import { WebUiProvider, Loader, Authorization } from '@maksit/webui-components'
 
 - `RemoteSelectBoxComponent`: use `searchRoute` (absolute API path string) instead of `apiRoute: ApiRoutes`.
 - `SecretComponent`: pass `generateSecretRoute` when `enableGenerate` is true.
-- ACL: generic `parseAclEntry` / `parseAclEntries` from `@maksit/webui-core`; per-app entity maps and `parse*AclEntries` live in each WebUI project (`models/acl.ts`).
-- Identity request types and Zod schemas (`LoginRequest` + `LoginRequestSchema`, `LogoutRequest` + `LogoutRequestSchema`, `RefreshTokenRequest` + `RefreshTokenRequestSchema`) live in `@maksit/webui-contracts`.
+- ACL: generic `parseAclEntry` / `parseAclEntries` from `@maks-it.com/webui-core`; per-app entity maps and `parse*AclEntries` live in each WebUI project (`models/acl.ts`).
+- Identity request types and Zod schemas (`LoginRequest` + `LoginRequestSchema`, `LogoutRequest` + `LogoutRequestSchema`, `RefreshTokenRequest` + `RefreshTokenRequestSchema`) live in `@maks-it.com/webui-contracts`.

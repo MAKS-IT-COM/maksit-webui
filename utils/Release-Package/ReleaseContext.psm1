@@ -6,9 +6,9 @@
     Helpers to resolve release semver from plugin configuration.
 
 .DESCRIPTION
-    Used by New-EngineContext and the DotNetReleaseVersion plugin:
-    - Source: DotNetReleaseVersion plugin -> projectFiles
-    - Version from first path in projectFiles (SDK-style .csproj <Version>)
+    Used by New-EngineContext and version plugins:
+    - DotNetReleaseVersion plugin -> projectFiles (.csproj <Version>)
+    - NpmReleaseVersion plugin -> packageJsonPath (package.json version)
 #>
 
 if (-not (Get-Command Write-Log -ErrorAction SilentlyContinue)) {
@@ -136,10 +136,90 @@ function Resolve-DotNetReleaseVersion {
 
     return [pscustomobject]@{
         version = $version
+        source = 'DotNetReleaseVersion'
     }
 }
 
-Export-ModuleMember -Function Get-CsprojPropertyValue, Get-CsprojVersions, Resolve-RelativePaths, Resolve-DotNetReleaseVersion
+function Resolve-NpmReleaseVersion {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Plugins,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ScriptDir
+    )
+
+    $releaseVersionPlugin = @($Plugins | Where-Object { $_.name -eq 'NpmReleaseVersion' } | Select-Object -First 1)
+    if ($releaseVersionPlugin.Count -eq 0 -or $null -eq $releaseVersionPlugin[0]) {
+        Write-Error "Configure an NpmReleaseVersion plugin in scriptsettings.json with packageJsonPath."
+        exit 1
+    }
+
+    $releaseVersionSettings = $releaseVersionPlugin[0]
+    $packageJsonPaths = @(Resolve-RelativePaths -Value $releaseVersionSettings.packageJsonPath -BasePath $ScriptDir)
+
+    if ($packageJsonPaths.Count -eq 0) {
+        Write-Error "Configure release version via NpmReleaseVersion.packageJsonPath."
+        exit 1
+    }
+
+    $packageJsonPath = $packageJsonPaths[0]
+    if (-not (Test-Path $packageJsonPath -PathType Leaf)) {
+        Write-Error "NpmReleaseVersion: package.json not found at: $packageJsonPath"
+        exit 1
+    }
+
+    Write-Log -Level "INFO" -Message "Reading version from npm package.json (packageJsonPath)..."
+    $json = Get-Content -Path $packageJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $version = [string]$json.version
+    if ([string]::IsNullOrWhiteSpace($version)) {
+        Write-Error "NpmReleaseVersion: 'version' is missing in '$packageJsonPath'."
+        exit 1
+    }
+
+    if ($version -notmatch '^\d+\.\d+\.\d+') {
+        Write-Error "NpmReleaseVersion: version '$version' in '$packageJsonPath' is not a valid semver."
+        exit 1
+    }
+
+    Write-Log -Level "OK" -Message "  $([System.IO.Path]::GetFileName($packageJsonPath)): $version"
+
+    return [pscustomobject]@{
+        version = $version
+        source = 'NpmReleaseVersion'
+    }
+}
+
+function Resolve-ReleaseVersion {
+    param(
+        [Parameter(Mandatory = $true)]
+        [object[]]$Plugins,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ScriptDir
+    )
+
+    $dotnetPlugin = @($Plugins | Where-Object { $_.name -eq 'DotNetReleaseVersion' -and $_.enabled -ne $false })
+    $npmPlugin = @($Plugins | Where-Object { $_.name -eq 'NpmReleaseVersion' -and $_.enabled -ne $false })
+
+    if ($dotnetPlugin.Count -gt 0 -and $npmPlugin.Count -gt 0) {
+        Write-Error "Configure only one release version plugin: DotNetReleaseVersion or NpmReleaseVersion, not both."
+        exit 1
+    }
+
+    if ($dotnetPlugin.Count -gt 0) {
+        return Resolve-DotNetReleaseVersion -Plugins $Plugins -ScriptDir $ScriptDir
+    }
+
+    if ($npmPlugin.Count -gt 0) {
+        return Resolve-NpmReleaseVersion -Plugins $Plugins -ScriptDir $ScriptDir
+    }
+
+    Write-Error "Configure a DotNetReleaseVersion plugin (projectFiles) or NpmReleaseVersion plugin (packageJsonPath) in scriptsettings.json."
+    exit 1
+}
+
+Export-ModuleMember -Function Get-CsprojPropertyValue, Get-CsprojVersions, Resolve-RelativePaths, Resolve-DotNetReleaseVersion, Resolve-NpmReleaseVersion, Resolve-ReleaseVersion
 
 
 

@@ -10,14 +10,14 @@ Canonical source: this folder in **maksit-repoutils**. Product repositories refr
 |------|------|
 | `Release-Package.ps1` | Loads settings, builds `New-EngineContext`, runs plugins in order. |
 | `PluginSupport.psm1` | Plugin discovery, `Invoke-ConfiguredPlugin`; publish plugins honor `skipPublishPlugins` from `ReleasePublishGuard` (no per-plugin `branches` for GitHub/NuGet/Docker/Helm). |
-| `ReleaseContext.psm1` | Resolves semver via `Resolve-DotNetReleaseVersion` from the `DotNetReleaseVersion` plugin `projectFiles` (first `.csproj` `<Version>`). |
-| `EngineSupport.psm1` | Warn-only dirty-tree preflight; default `context.tag` = `v{version}` from DotNetReleaseVersion; `Initialize-ReleaseStageContext` sets `releaseDir` only. |
+| `ReleaseContext.psm1` | Resolves semver via `Resolve-ReleaseVersion` from `DotNetReleaseVersion.projectFiles` (first `.csproj` `<Version>`) or `NpmReleaseVersion.packageJsonPath`. |
+| `EngineSupport.psm1` | Warn-only dirty-tree preflight; default `context.tag` = `v{version}` from the configured version plugin; `Initialize-ReleaseStageContext` sets `releaseDir` only. |
 
 ## Plugins
 
 `CorePlugins/` — e.g. `DotNetReleaseVersion`, `NpmReleaseVersion`, `NpmBuild`, `NpmPublish`, `DockerPush`, `HelmPush`, `ReleasePublishGuard`. Optional `CustomPlugins/`.
 
-`DotNetPack` and `QualityGate` (when used) can declare their own `projectFiles`; semver still comes only from `DotNetReleaseVersion.projectFiles`.
+`DotNetPack` and `QualityGate` (when used) can declare their own `projectFiles`; semver still comes from the configured version plugin (`DotNetReleaseVersion` or `NpmReleaseVersion`).
 
 ## `ReleasePublishGuard`
 
@@ -38,7 +38,7 @@ For TypeScript monorepos published to npmjs:
 
 ## Helm charts in git
 
-Commit `Chart.yaml` with placeholder `version` and `appVersion` (for example `0.0.0`) so `helm lint` stays valid. `HelmPush` temporarily replaces both with the **bare** release semver from `context.version` (`DotNetReleaseVersion`, e.g. `3.3.4` without a `v` prefix) before packaging and OCI push; if `version` were missing, it would fall back to stripping `v`/`V` from `context.tag`. Then it restores `Chart.yaml`. `DockerPush` tags images with the **bare** semver from `context.version` (e.g. `3.3.4`), also pushes `vX.Y.Z` and `shared.tag` when they differ, and optional `latest` — not from `Chart.yaml`; optionally use per-image `versionEnvFiles` to temporarily set `VITE_APP_VERSION={shared.version}` in frontend `.env` files during docker build, then restore originals.
+Commit `Chart.yaml` with placeholder `version` and `appVersion` (for example `0.0.0`) so `helm lint` stays valid. `HelmPush` temporarily replaces both with the **bare** release semver from `context.version` (`DotNetReleaseVersion`, e.g. `3.3.4` without a `v` prefix) before packaging and OCI push; if `version` were missing, it would fall back to stripping `v`/`V` from `context.tag`. Then it restores `Chart.yaml`. `DockerPush` tags images with the **bare** semver from `context.version` (e.g. `3.3.4`), also pushes `vX.Y.Z` and `shared.tag` when they differ, and optional `latest` — not from `Chart.yaml`; optionally use per-image `versionEnvFiles` to temporarily set `VITE_APP_VERSION={shared.version}` in frontend `.env` files during docker build, then restore originals. Each image may override the plugin `contextPath` with its own `contextPath` (paths relative to Release-Package); `dockerfile` and `versionEnvFiles` resolve against that per-image context.
 
 Sample chart: repository `charts/my-service/` (matches the sample `chartPath` in `scriptsettings.json`). Product repos often use `src/helm/` instead.
 

@@ -149,13 +149,21 @@ function Invoke-Plugin {
                 throw "Each images[] entry must define 'service' and 'dockerfile'."
             }
 
+            $service = [string]$img.service
             $dockerfileRel = [string]$img.dockerfile
-            $dockerfilePath = [System.IO.Path]::GetFullPath((Join-Path $contextPath $dockerfileRel))
+
+            $imgContextPath = $contextPath
+            if ($img.PSObject.Properties.Name -contains 'contextPath' -and -not [string]::IsNullOrWhiteSpace([string]$img.contextPath)) {
+                $imgContextPath = [System.IO.Path]::GetFullPath((Join-Path $scriptDir ([string]$img.contextPath)))
+                if (-not (Test-Path $imgContextPath -PathType Container)) {
+                    throw "Docker context directory not found for image '$service': $imgContextPath"
+                }
+            }
+
+            $dockerfilePath = [System.IO.Path]::GetFullPath((Join-Path $imgContextPath $dockerfileRel))
             if (-not (Test-Path $dockerfilePath -PathType Leaf)) {
                 throw "Dockerfile not found: $dockerfilePath"
             }
-
-            $service = [string]$img.service
             $baseName = "$registryUrl/$($pluginSettings.projectName)/$service"
 
             $versionEnvFiles = @()
@@ -165,7 +173,7 @@ function Invoke-Plugin {
                         continue
                     }
 
-                    $envFilePath = [System.IO.Path]::GetFullPath((Join-Path $contextPath ([string]$relativeEnvFile)))
+                    $envFilePath = [System.IO.Path]::GetFullPath((Join-Path $imgContextPath ([string]$relativeEnvFile)))
                     if (-not (Test-Path -LiteralPath $envFilePath -PathType Leaf)) {
                         throw "Configured versionEnvFiles entry not found: $envFilePath"
                     }
@@ -187,7 +195,7 @@ function Invoke-Plugin {
 
                 $primaryRef = "${baseName}:$($imageTags[0])"
                 Write-Log -Level "STEP" -Message "Building $primaryRef ..."
-                docker build -t $primaryRef -f $dockerfilePath $contextPath
+                docker build -t $primaryRef -f $dockerfilePath $imgContextPath
                 if ($LASTEXITCODE -ne 0) {
                     throw "Docker build failed for $primaryRef"
                 }

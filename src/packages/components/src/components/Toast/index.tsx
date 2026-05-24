@@ -1,5 +1,4 @@
 import { useState, useEffect, FC } from 'react'
-import { v4 as uuidv4 } from 'uuid'
 
 // Define types for a toast
 interface Toast {
@@ -9,6 +8,8 @@ interface Toast {
     duration?: number;
 }
 
+const createToastId = (): string => crypto.randomUUID()
+
 const Toast: FC = () => {
   const [toasts, setToasts] = useState<Toast[]>([])
 
@@ -17,7 +18,7 @@ const Toast: FC = () => {
       const { message, type, duration } = event.detail
 
       // Add the new toast, avoiding duplicates with same message & type
-      const id = uuidv4()
+      const id = createToastId()
       setToasts(prev => {
         const hasDuplicate = prev.some(t => t.message === message && t.type === type)
         if (hasDuplicate) return prev

@@ -1,4 +1,4 @@
-import type { SearchEntityScopeEntry } from '@maksit/webui-contracts'
+import type { SearchEntityScopeEntry } from '@maks-it.com/webui-contracts'
 
 export interface EntityScopesSummaryProps<TScopeEntityType extends number = number> {
   entries: SearchEntityScopeEntry<TScopeEntityType>[]

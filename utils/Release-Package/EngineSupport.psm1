@@ -22,7 +22,7 @@ if (-not (Get-Command Get-PluginStageLabel -ErrorAction SilentlyContinue) -or -n
     }
 }
 
-if (-not (Get-Command Resolve-DotNetReleaseVersion -ErrorAction SilentlyContinue)) {
+if (-not (Get-Command Resolve-ReleaseVersion -ErrorAction SilentlyContinue)) {
     $releaseContextModulePath = Join-Path $PSScriptRoot "ReleaseContext.psm1"
     if (Test-Path $releaseContextModulePath -PathType Leaf) {
         Import-Module $releaseContextModulePath -Force
@@ -79,7 +79,9 @@ function New-EngineContext {
         [psobject]$Settings
     )
 
-    $version = (Resolve-DotNetReleaseVersion -Plugins $Plugins -ScriptDir $ScriptDir).version
+    $resolvedVersion = Resolve-ReleaseVersion -Plugins $Plugins -ScriptDir $ScriptDir
+    $version = $resolvedVersion.version
+    $versionSource = $resolvedVersion.source
     $artifactsDirectory = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir '..\\..\\release'))
 
     $currentBranch = Get-CurrentBranch
@@ -113,7 +115,7 @@ function New-EngineContext {
     Assert-WorkingTreeClean
 
     $tag = "v$version"
-    Write-Log -Level "INFO" -Message "  Release tag default from DotNetReleaseVersion: $tag (ReleasePublishGuard may replace from git when publish is allowed)."
+    Write-Log -Level "INFO" -Message "  Release tag default from ${versionSource}: $tag (ReleasePublishGuard may replace from git when publish is allowed)."
 
     return [pscustomobject]@{
         scriptDir = $ScriptDir

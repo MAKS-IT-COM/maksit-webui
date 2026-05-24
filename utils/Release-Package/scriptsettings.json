@@ -39,7 +39,8 @@
       "githubToken": "GITHUB_MAKS_IT_COM",
       "repository": "https://github.com/MAKS-IT-COM/maksit-webui",
       "releaseNotesFile": "..\\..\\CHANGELOG.md",
-      "releaseTitlePattern": "Release {version}"
+      "releaseTitlePattern": "Release {version}",
+      "requireReleaseAssets": false
     },
     {
       "name": "NpmPublish",
@@ -50,9 +51,9 @@
       "access": "public",
       "workspaceRoot": "..\\..\\src",
       "publishOrder": [
-        "@maksit/webui-contracts",
-        "@maksit/webui-core",
-        "@maksit/webui-components"
+        "@maks-it.com/webui-contracts",
+        "@maks-it.com/webui-core",
+        "@maks-it.com/webui-components"
       ]
     }
   ],

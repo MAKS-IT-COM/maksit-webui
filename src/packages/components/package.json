@@ -1,6 +1,6 @@
 {
-  "name": "@maksit/webui-components",
-  "version": "0.1.0",
+  "name": "@maks-it.com/webui-components",
+  "version": "0.2.0",
   "description": "Shared React components for MaksIT WebUI apps",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -18,7 +18,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --clean --external react --external react-dom --external react-router-dom --external lucide-react --external @tanstack/react-table --external react-virtualized",
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.build.json --external react --external react-dom --external react-router-dom --external lucide-react --external @tanstack/react-table --external react-virtualized",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "prepublishOnly": "npm run build"
@@ -33,34 +33,33 @@
     "directory": "src/packages/components"
   },
   "dependencies": {
-    "@maksit/webui-contracts": "^0.1.0",
-    "@maksit/webui-core": "^0.1.0",
-    "date-fns": "^4.1.0",
-    "lodash": "^4.17.23",
-    "uuid": "^13.0.0"
+    "@maks-it.com/webui-contracts": "^0.2.0",
+    "@maks-it.com/webui-core": "^0.2.0",
+    "date-fns": "^4.3.0",
+    "lodash": "^4.18.1"
   },
   "peerDependencies": {
     "@tanstack/react-table": "^8.0.0",
-    "lucide-react": "^0.500.0",
+    "lucide-react": "^1.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
     "react-router-dom": "^7.0.0",
     "react-virtualized": "^9.22.0",
-    "zod": "^4.0.0"
+    "zod": "^4.4.0"
   },
   "devDependencies": {
     "@tanstack/react-table": "^8.21.3",
     "@types/lodash": "^4.17.24",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@types/react-virtualized": "^9.22.3",
-    "lucide-react": "^0.576.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-router-dom": "^7.13.1",
+    "lucide-react": "^1.16.0",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1",
     "react-virtualized": "^9.22.6",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.3",
-    "zod": "^4.3.6"
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "zod": "^4.4.3"
   }
 }

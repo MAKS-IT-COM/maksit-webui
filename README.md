@@ -1,4 +1,6 @@
-# maksit-webui
+# MaksIT.WebUI
+
+![Line Coverage](/assets/badges/coverage-lines.svg) ![Branch Coverage](/assets/badges/coverage-branches.svg) ![Method Coverage](/assets/badges/coverage-methods.svg)
 
 Shared React UI library for **maksit-certs-ui** and **maksit-vault** WebUI apps.
 
@@ -6,9 +8,9 @@ Shared React UI library for **maksit-certs-ui** and **maksit-vault** WebUI apps.
 
 | npm package | Description |
 |-------------|-------------|
-| `@maksit/webui-contracts` | Shared TypeScript contracts (paging, gallery types, patch ops, scopes) |
-| `@maksit/webui-core` | Utilities (`deepDelta`, enum helpers, ACL parsers) and `useFormState` |
-| `@maksit/webui-components` | React components, layout, editors, DataTable, auth shell |
+| `@maks-it.com/webui-contracts` | Shared TypeScript contracts (paging, gallery types, patch ops, scopes) |
+| `@maks-it.com/webui-core` | Utilities (`deepDelta`, enum helpers, ACL parsers) and `useFormState` |
+| `@maks-it.com/webui-components` | React components, layout, editors, DataTable, auth shell |
 
 Source lives under `src/` (npm workspaces). Release automation lives under `utils/` (from [maksit-repoutils](https://github.com/MAKS-IT-COM/maksit-repoutils)).
 
@@ -18,7 +20,10 @@ Source lives under `src/` (npm workspaces). Release automation lives under `util
 cd src
 npm install
 npm run build
+npm test
 ```
+
+Tests and coverage badges: **`utils/Run-Tests/Run-Tests.bat`** (plugin config in `utils/Run-Tests/scriptsettings.json`; uses `NpmJestTest`).
 
 ## Release to npmjs
 
@@ -41,7 +46,7 @@ Refresh shared utils from repoutils: **`utils/Update-RepoUtils/Update-RepoUtils.
 ## Consume in product repos
 
 ```bash
-npm install @maksit/webui-contracts @maksit/webui-core @maksit/webui-components
+npm install @maks-it.com/webui-contracts @maks-it.com/webui-core @maks-it.com/webui-components
 ```
 
 Wrap the app with `WebUiProvider` and pass axios/redux adapters — see [assets/docs/NPM_CONSUMPTION.md](assets/docs/NPM_CONSUMPTION.md).

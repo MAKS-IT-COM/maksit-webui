@@ -1,7 +1,7 @@
 import { useState, useCallback, ChangeEvent, useEffect, useRef } from 'react'
-import type { PagedRequest } from '@maksit/webui-contracts'
-import type { SearchResponseBase } from '@maksit/webui-contracts'
-import { deepEqual } from '@maksit/webui-core'
+import type { PagedRequest } from '@maks-it.com/webui-contracts'
+import type { SearchResponseBase } from '@maks-it.com/webui-contracts'
+import { deepEqual } from '@maks-it.com/webui-core'
 import { SelectBoxComponent } from './SelectBoxComponent'
 
 export type RemoteSelectSearchDataSource<TRequest extends PagedRequest> = (

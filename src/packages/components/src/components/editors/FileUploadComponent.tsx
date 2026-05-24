@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { ButtonComponent } from './ButtonComponent'
-import { TrashIcon } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 
 interface FileUploadComponentProps {
   label?: string
@@ -163,7 +163,7 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
         disabled={disabled || displayFiles.length === 0}
         colspan={1}
       >
-        <TrashIcon />
+        <Trash2 />
       </ButtonComponent>
 
       {/* Select files button */}

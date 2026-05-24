@@ -1,4 +1,4 @@
-import z, { object, record, string, type ZodType } from 'zod'
+import z, { intersection, object, record, string, type ZodType } from 'zod'
 import { PatchOperation } from './PatchOperation'
 import { RequestModelBase, RequestModelBaseSchema } from './RequestModelBase'
 
@@ -8,7 +8,8 @@ export interface PatchRequestModelBase extends RequestModelBase {
   [key: string]: unknown
 }
 
-export const PatchRequestModelBaseSchema: ZodType<PatchRequestModelBase> = RequestModelBaseSchema.and(
+export const PatchRequestModelBaseSchema: ZodType<PatchRequestModelBase> = intersection(
+  RequestModelBaseSchema,
   object({
     operations: record(string(), z.enum(PatchOperation)).optional(),
   })

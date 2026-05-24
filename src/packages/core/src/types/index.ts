@@ -3,5 +3,5 @@ export type {
   FormValidationResult,
   FormValidationSchema,
 } from './FormValidationSchema'
-export type { PagedResponse } from '@maksit/webui-contracts'
+export type { PagedResponse } from '@maks-it.com/webui-contracts'
 export { ScopePermission } from './ScopePermissions'

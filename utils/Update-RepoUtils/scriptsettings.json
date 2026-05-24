@@ -9,7 +9,8 @@
     "preserveFileName": "scriptsettings.json",
     "cloneDepth": 1,
     "skippedRelativeDirectories": [
-      "Release-Package/CustomPlugins"
+      "Release-Package/CustomPlugins",
+      "Run-Tests/CustomPlugins"
     ]
   }
 }

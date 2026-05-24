@@ -45,7 +45,8 @@ function Invoke-Plugin {
 
     $workspaceRoot = $null
     if ($pluginSettings.workspaceRoot) {
-        $workspaceRoot = (Resolve-RelativePaths -Value $pluginSettings.workspaceRoot -BasePath $shared.scriptDir)[0]
+        $workspaceRoots = @(Resolve-RelativePaths -Value $pluginSettings.workspaceRoot -BasePath $shared.scriptDir)
+        $workspaceRoot = $workspaceRoots[0]
     }
     elseif ($shared.PSObject.Properties['npmWorkspaceRoot'] -and -not [string]::IsNullOrWhiteSpace([string]$shared.npmWorkspaceRoot)) {
         $workspaceRoot = [string]$shared.npmWorkspaceRoot

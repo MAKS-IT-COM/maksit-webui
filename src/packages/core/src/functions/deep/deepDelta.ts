@@ -1,4 +1,4 @@
-import { COLLECTION_ITEM_OPERATION, PatchOperation } from '@maksit/webui-contracts'
+import { COLLECTION_ITEM_OPERATION, PatchOperation } from '@maks-it.com/webui-contracts'
 import { deepCopy } from './deepCopy'
 import { deepEqual } from './deepEqual'
 

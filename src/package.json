@@ -1,7 +1,7 @@
 {
   "name": "maksit-webui",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared React UI library for MaksIT Certs UI and Vault WebUI",
   "workspaces": [
     "packages/*"
@@ -10,12 +10,21 @@
     "node": ">=20"
   },
   "overrides": {
-    "zod": "^4.3.6"
+    "zod": "^4.4.3",
+    "glob": "^13.0.6",
+    "test-exclude": "^8.0.0"
   },
   "scripts": {
-    "build": "npm run build -w @maksit/webui-contracts && npm run build -w @maksit/webui-core && npm run build -w @maksit/webui-components",
+    "build": "npm run build -w @maks-it.com/webui-contracts && npm run build -w @maks-it.com/webui-core && npm run build -w @maks-it.com/webui-components",
+    "test": "jest --config jest.config.cjs",
+    "test:coverage": "jest --config jest.config.cjs --coverage",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "clean": "npm run clean --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11"
   },
   "author": "MaksIT",
   "license": "MIT"

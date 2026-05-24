@@ -1,6 +1,6 @@
 {
-  "name": "@maksit/webui-core",
-  "version": "0.1.0",
+  "name": "@maks-it.com/webui-core",
+  "version": "0.2.0",
   "description": "Shared utilities and hooks for MaksIT WebUI apps",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -18,7 +18,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.build.json",
+    "test": "jest --config ../../jest.config.cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
     "prepublishOnly": "npm run build"
@@ -33,20 +34,20 @@
     "directory": "src/packages/core"
   },
   "dependencies": {
-    "@maksit/webui-contracts": "^0.1.0",
-    "date-fns": "^4.1.0"
+    "@maks-it.com/webui-contracts": "^0.2.0",
+    "date-fns": "^4.3.0"
   },
   "peerDependencies": {
-    "axios": "^1.7.0",
+    "axios": "^1.16.0",
     "react": "^18.0.0 || ^19.0.0",
-    "zod": "^4.0.0"
+    "zod": "^4.4.0"
   },
   "devDependencies": {
-    "@types/react": "^19.2.14",
-    "axios": "^1.13.2",
-    "react": "^19.2.4",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.3",
-    "zod": "^4.3.6"
+    "@types/react": "^19.2.15",
+    "axios": "^1.16.1",
+    "react": "^19.2.6",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "zod": "^4.4.3"
   }
 }

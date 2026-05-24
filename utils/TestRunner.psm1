@@ -283,4 +283,110 @@ function Invoke-TestsWithCoverage {
     }
 }
 
-Export-ModuleMember -Function Invoke-TestsWithCoverage
+function Invoke-NpmJestTestsWithCoverage {
+    <#
+    .SYNOPSIS
+        Runs npm/Jest tests with coverage and returns normalized metrics.
+
+    .PARAMETER WorkspaceRoot
+        npm workspace root (folder containing package.json and jest.config).
+
+    .PARAMETER TestScript
+        npm script name to run (default: test). Coverage flags are appended via `--`.
+
+    .PARAMETER CoverageDirectory
+        Relative path under WorkspaceRoot where Jest writes coverage output.
+
+    .PARAMETER Silent
+        Suppress console output from npm.
+
+    .OUTPUTS
+        Same metric shape as Invoke-TestsWithCoverage, plus CoverageSummaryFile when available.
+    #>
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$WorkspaceRoot,
+
+        [string]$TestScript = 'test',
+
+        [string]$CoverageDirectory = 'coverage',
+
+        [switch]$Silent
+    )
+
+    $ErrorActionPreference = 'Stop'
+    $workspaceFull = [System.IO.Path]::GetFullPath($WorkspaceRoot)
+    if (-not (Test-Path (Join-Path $workspaceFull 'package.json') -PathType Leaf)) {
+        return [PSCustomObject]@{
+            Success = $false
+            Error = "package.json not found in workspace root: $workspaceFull"
+        }
+    }
+
+    if (-not $Silent) {
+        Write-TestRunnerLogInternal -Level 'STEP' -Message 'Running npm/Jest tests with coverage...'
+        Write-TestRunnerLogInternal -Level 'INFO' -Message "Workspace: $workspaceFull"
+    }
+
+    Push-Location $workspaceFull
+    try {
+        $npmArgs = @('run', $TestScript, '--', '--coverage', '--coverageReporters=json-summary', '--coverageReporters=text')
+        if ($Silent) {
+            $null = & npm @npmArgs 2>&1
+        }
+        else {
+            & npm @npmArgs
+        }
+
+        if ($LASTEXITCODE -ne 0) {
+            return [PSCustomObject]@{
+                Success = $false
+                Error = "npm run $TestScript failed with exit code $LASTEXITCODE"
+            }
+        }
+    }
+    finally {
+        Pop-Location
+    }
+
+    $summaryPath = Join-Path $workspaceFull (Join-Path $CoverageDirectory 'coverage-summary.json')
+    if (-not (Test-Path $summaryPath -PathType Leaf)) {
+        return [PSCustomObject]@{
+            Success = $false
+            Error = "Jest coverage summary not found at: $summaryPath"
+        }
+    }
+
+    $summaryJson = Get-Content -LiteralPath $summaryPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $total = $summaryJson.total
+    if ($null -eq $total) {
+        return [PSCustomObject]@{
+            Success = $false
+            Error = "Jest coverage summary is missing 'total' metrics in: $summaryPath"
+        }
+    }
+
+    $lineRate = [math]::Round([double]$total.lines.pct, 1)
+    $branchRate = [math]::Round([double]$total.branches.pct, 1)
+    $methodRate = [math]::Round([double]$total.functions.pct, 1)
+    $totalMethods = [int]$total.functions.total
+    $coveredMethods = [int]$total.functions.covered
+    $resultsDirectory = [System.IO.Path]::GetFullPath((Join-Path $workspaceFull $CoverageDirectory))
+
+    if (-not $Silent) {
+        Write-TestRunnerLogInternal -Level 'OK' -Message "Coverage summary: $summaryPath"
+    }
+
+    return [PSCustomObject]@{
+        Success = $true
+        LineRate = $lineRate
+        BranchRate = $branchRate
+        MethodRate = $methodRate
+        TotalMethods = $totalMethods
+        CoveredMethods = $coveredMethods
+        CoverageSummaryFile = $summaryPath
+        ResultsDirectory = $resultsDirectory
+    }
+}
+
+Export-ModuleMember -Function Invoke-TestsWithCoverage, Invoke-NpmJestTestsWithCoverage

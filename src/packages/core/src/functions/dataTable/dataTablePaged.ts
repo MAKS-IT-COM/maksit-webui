@@ -1,4 +1,4 @@
-import type { PagedResponse } from '@maksit/webui-contracts'
+import type { PagedResponse } from '@maks-it.com/webui-contracts'
 
 /**
  * Virtualized DataTable view model used by client paging and search helpers.

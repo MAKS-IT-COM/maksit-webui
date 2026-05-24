@@ -1,4 +1,4 @@
-import { object, RefinementCtx, string, ZodIssueCode, type ZodType } from 'zod'
+import { object, RefinementCtx, string, type ZodType } from 'zod'
 
 export interface LoginRequest {
   username: string
@@ -10,7 +10,7 @@ export interface LoginRequest {
 const loginRequestSchemaRefine = (data: LoginRequest, ctx: RefinementCtx) => {
   if (data.username === '') {
     ctx.addIssue({
-      code: ZodIssueCode.custom,
+      code: 'custom',
       message: 'Username cannot be empty',
       path: ['username'],
     })
@@ -18,7 +18,7 @@ const loginRequestSchemaRefine = (data: LoginRequest, ctx: RefinementCtx) => {
 
   if (data.password === '') {
     ctx.addIssue({
-      code: ZodIssueCode.custom,
+      code: 'custom',
       message: 'Password cannot be empty',
       path: ['password'],
     })
@@ -26,7 +26,7 @@ const loginRequestSchemaRefine = (data: LoginRequest, ctx: RefinementCtx) => {
 
   if (data.twoFactorCode && data.twoFactorRecoveryCode) {
     ctx.addIssue({
-      code: ZodIssueCode.custom,
+      code: 'custom',
       message: 'Cannot have both twoFactorCode and twoFactorRecoveryCode',
       path: ['twoFactorCode', 'twoFactorRecoveryCode'],
     })

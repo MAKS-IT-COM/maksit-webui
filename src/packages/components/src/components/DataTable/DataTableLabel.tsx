@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { formatISODateString } from '@maksit/webui-core'
+import { formatISODateString } from '@maks-it.com/webui-core'
 
 interface NormalLabelProps {
   type: 'normal'

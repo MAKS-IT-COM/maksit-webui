@@ -68,12 +68,11 @@ function Invoke-Plugin {
     $pluginSettings = $Settings
     $shared = $Settings.context
 
-    $packageJsonPath = if ($pluginSettings.packageJsonPath) {
-        (Resolve-RelativePaths -Value $pluginSettings.packageJsonPath -BasePath $shared.scriptDir)[0]
-    }
-    else {
+    $packageJsonPaths = @(Resolve-RelativePaths -Value $pluginSettings.packageJsonPath -BasePath $shared.scriptDir)
+    if ($packageJsonPaths.Count -eq 0) {
         throw "NpmReleaseVersion plugin requires 'packageJsonPath' in scriptsettings.json."
     }
+    $packageJsonPath = $packageJsonPaths[0]
 
     $version = Get-PackageJsonVersionInternal -PackageJsonPath $packageJsonPath
     $syncWorkspaceVersions = $false

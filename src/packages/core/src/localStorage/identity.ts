@@ -1,4 +1,4 @@
-import type { LoginResponse } from '@maksit/webui-contracts'
+import type { LoginResponse } from '@maks-it.com/webui-contracts'
 
 const readIdentity = () => {
   const json = localStorage.getItem('identity')

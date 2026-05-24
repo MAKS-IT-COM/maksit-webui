@@ -1,4 +1,4 @@
-import { boolean, number, object, record, string, type ZodType } from 'zod'
+import { boolean, intersection, number, object, record, string, type ZodType } from 'zod'
 import type { RequestModelBase } from './RequestModelBase'
 import { RequestModelBaseSchema } from './RequestModelBase'
 
@@ -11,7 +11,8 @@ export interface PagedRequest extends RequestModelBase {
   isAscending?: boolean
 }
 
-export const PagedRequestSchema: ZodType<PagedRequest> = RequestModelBaseSchema.and(
+export const PagedRequestSchema: ZodType<PagedRequest> = intersection(
+  RequestModelBaseSchema,
   object({
     pageSize: number().optional(),
     pageNumber: number().optional(),

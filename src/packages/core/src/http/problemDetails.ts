@@ -1,4 +1,4 @@
-import type { ProblemDetails } from '@maksit/webui-contracts'
+import type { ProblemDetails } from '@maks-it.com/webui-contracts'
 
 /** Builds a user-facing message from RFC 7807 problem details. */
 export function formatProblemDetailsMessage(problem: ProblemDetails): string {

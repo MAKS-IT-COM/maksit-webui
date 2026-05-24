@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { AutoSizer, MultiGrid, GridCellProps } from 'react-virtualized'
 
-import { mapPagedToDataTable, type DataTablePageView, type PagedResponse } from '@maksit/webui-core'
+import { mapPagedToDataTable, type DataTablePageView, type PagedResponse } from '@maks-it.com/webui-core'
 import { Plus, Trash2, Edit } from 'lucide-react'
-import { debounce } from 'lodash'
+import debounce from 'lodash/debounce'
 
 
 interface FilterProps {
