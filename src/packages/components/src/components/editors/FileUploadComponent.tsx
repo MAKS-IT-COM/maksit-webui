@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react'
+import { colSpanClass, type GridColSpan } from '../../functions/tailwind'
 import { ButtonComponent } from './ButtonComponent'
 import { Trash2 } from 'lucide-react'
 
 interface FileUploadComponentProps {
   label?: string
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  colspan?: GridColSpan
   multiple?: boolean
   files?: File[]
   onChange?: (files: File[]) => void
@@ -80,7 +81,7 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
   }
 
   return (
-    <div className={`grid grid-cols-4 gap-2 ${colspan ? `col-span-${colspan}` : 'w-full'}`}>
+    <div className={`grid grid-cols-4 gap-2 ${colSpanClass(colspan)}`}>
       {/* File input (hidden) */}
       <input
         ref={inputRef}

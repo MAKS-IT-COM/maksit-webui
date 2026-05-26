@@ -1,11 +1,12 @@
 import { Eye, EyeOff } from 'lucide-react'
 import { ChangeEvent, FC, useEffect, useRef, useState } from 'react'
+import type { GridColSpan } from '../../functions/tailwind'
 import { FieldContainer } from './FieldContainer'
 import { getInputClasses } from './editorStyles'
 
 interface TextBoxComponentProps {
   label: string
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  colspan?: GridColSpan
   errorText?: string
   value?: string | number
   onChange?: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void

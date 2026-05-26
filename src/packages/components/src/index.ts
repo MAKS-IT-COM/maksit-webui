@@ -27,8 +27,6 @@ export type {
 } from './components/editors/RemoteSelectBoxComponent'
 export { addToast } from './components/Toast/addToast'
 export { Toast as ToastContainer } from './components/Toast'
-export { VaultStyleDataTable, VaultStyleListFooter, VaultStyleListSection } from './components/list'
-export type { VaultStyleColumn } from './components/list'
 export { EntityScopesSummary } from './components/Scopes'
 export type { EntityScopesSummaryProps } from './components/Scopes'
 export { Layout } from './components/Layout'

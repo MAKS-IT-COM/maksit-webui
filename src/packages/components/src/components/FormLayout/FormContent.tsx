@@ -1,6 +1,6 @@
 import { FC, ReactNode } from 'react'
 
-interface FormContentProps {
+export interface FormContentProps {
     children?: ReactNode
     /** Merged after base layout; use e.g. `flex flex-col overflow-hidden` when a child should fill height (iframe). */
     className?: string

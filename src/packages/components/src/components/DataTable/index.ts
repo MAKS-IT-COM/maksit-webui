@@ -1,6 +1,7 @@
 import {
   DataTable,
-  DataTableColumn
+  DataTableColumn,
+  type DataTableProps,
 } from './DataTable'
 
 import {
@@ -9,7 +10,8 @@ import {
 } from './helpers'
 
 export type {
-  DataTableColumn
+  DataTableColumn,
+  DataTableProps,
 }
 
 export { DataTableFilter } from './DataTableFilter'

@@ -3,13 +3,14 @@ import { parseISO, formatISO, format, getDaysInMonth, addMonths, subMonths } fro
 import { ButtonComponent } from './ButtonComponent'
 import { TextBoxComponent } from './TextBoxComponent'
 import { CircleX } from 'lucide-react'
+import type { GridColSpan } from '../../functions/tailwind'
 import { FieldContainer } from './FieldContainer'
 import { getInputClasses } from './editorStyles'
 
 const DISPLAY_FORMAT = 'yyyy-MM-dd HH:mm'
 
 interface DateTimePickerComponentProps {
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  colspan?: GridColSpan
   label: string
   value?: string
   onChange?: (isoString?: string) => void

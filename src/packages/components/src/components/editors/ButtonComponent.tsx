@@ -1,8 +1,9 @@
-import { ReactNode } from 'react'
+import { type FC, type MouseEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { colSpanClass, type GridColSpan } from '../../functions/tailwind'
 
 interface CommonButtonProps {
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  colspan?: GridColSpan;
   route?: string;
   buttonHierarchy?: 'primary' | 'secondary' | 'success' | 'error' | 'warning';
   onClick?: () => void;
@@ -13,7 +14,7 @@ type ButtonComponentProps =
   | ({ label: string; children?: never } & CommonButtonProps)
   | ({ children: ReactNode; label?: never } & CommonButtonProps);
 
-const ButtonComponent: React.FC<ButtonComponentProps> = (props) => {
+const ButtonComponent: FC<ButtonComponentProps> = (props) => {
   const {
     colspan,
     route,
@@ -25,7 +26,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = (props) => {
   const isChildren = 'children' in props && props.children !== undefined
   const content = 'label' in props ? props.label : props.children
 
-  const handleClick = (e?: React.MouseEvent) => {
+  const handleClick = (e?: MouseEvent) => {
     if (disabled) {
       e?.preventDefault()
       return
@@ -63,7 +64,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = (props) => {
     ? (
       <Link
         to={route}
-        className={`${buttonClass} px-4 py-2 rounded ${colspan ? `col-span-${colspan}` : 'w-full'} ${centeringClass} ${disabledClass}`}
+        className={`${buttonClass} px-4 py-2 rounded ${colSpanClass(colspan)} ${centeringClass} ${disabledClass}`}
         onClick={handleClick}
         tabIndex={disabled ? -1 : undefined}
         aria-disabled={disabled}
@@ -73,7 +74,7 @@ const ButtonComponent: React.FC<ButtonComponentProps> = (props) => {
       </Link>
     ) : (
       <button
-        className={`${buttonClass} px-4 py-2 rounded ${colspan ? `col-span-${colspan}` : 'w-full'} ${centeringClass} ${disabledClass}`}
+        className={`${buttonClass} px-4 py-2 rounded ${colSpanClass(colspan)} ${centeringClass} ${disabledClass}`}
         onClick={handleClick}
         disabled={disabled}
       >

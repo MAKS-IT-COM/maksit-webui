@@ -1,6 +1,6 @@
 {
   "name": "@maks-it.com/webui-core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Shared utilities and hooks for MaksIT WebUI apps",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -34,7 +34,7 @@
     "directory": "src/packages/core"
   },
   "dependencies": {
-    "@maks-it.com/webui-contracts": "^0.2.0",
+    "@maks-it.com/webui-contracts": "^0.3.0",
     "date-fns": "^4.3.0"
   },
   "peerDependencies": {

@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "rootDir": "..",
+    "paths": {
+      "@webui/components": ["../packages/components/src"],
+      "@webui/contracts": ["../packages/contracts/src"],
+      "@webui/core": ["../packages/core/src"],
+      "@webui/components/*": ["../packages/components/src/*"],
+      "@webui/contracts/*": ["../packages/contracts/src/*"],
+      "@webui/core/*": ["../packages/core/src/*"]
+    }
+  },
+  "include": [
+    "./**/*",
+    "../stories/**/*"
+  ]
+}

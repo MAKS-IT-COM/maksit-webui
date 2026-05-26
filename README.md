@@ -21,7 +21,10 @@ cd src
 npm install
 npm run build
 npm test
+npm run storybook
 ```
+
+**Storybook** (`npm run storybook`) runs a local catalog of `@maks-it.com/webui-components` with Tailwind, React Router, autodocs, a11y checks, and **Vitest component tests** (testing widget + `npm run test-storybook`). Stories live under `src/stories/components/` (mirroring component folders); see `src/stories/README.md` for story conventions and testing.
 
 Tests and coverage badges: **`utils/Run-Tests/Run-Tests.bat`** (plugin config in `utils/Run-Tests/scriptsettings.json`; uses `NpmJestTest`).
 

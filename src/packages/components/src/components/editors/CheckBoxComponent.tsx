@@ -1,16 +1,17 @@
-import { useEffect, useRef } from 'react'
+import { type ChangeEvent, type FC, useEffect, useRef } from 'react'
+import type { GridColSpan } from '../../functions/tailwind'
 import { FieldContainer } from './FieldContainer'
 
 interface CheckBoxComponentProps {
-    colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+    colspan?: GridColSpan;
     label: string;
     value: boolean;
-    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
     errorText?: string;
     disabled?: boolean;
 }
 
-const CheckBoxComponent: React.FC<CheckBoxComponentProps> = (props) => {
+const CheckBoxComponent: FC<CheckBoxComponentProps> = (props) => {
 
   const {
     colspan = 6,
@@ -27,7 +28,7 @@ const CheckBoxComponent: React.FC<CheckBoxComponentProps> = (props) => {
     prevValue.current = value
   }, [value])
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (prevValue.current === e.target.checked)
       return
 

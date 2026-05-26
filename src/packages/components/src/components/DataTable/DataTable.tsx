@@ -4,6 +4,7 @@ import { AutoSizer, MultiGrid, GridCellProps } from 'react-virtualized'
 import { mapPagedToDataTable, type DataTablePageView, type PagedResponse } from '@maks-it.com/webui-core'
 import { Plus, Trash2, Edit } from 'lucide-react'
 import debounce from 'lodash/debounce'
+import { colSpanClass, type GridColSpan } from '../../functions/tailwind'
 
 
 interface FilterProps {
@@ -27,7 +28,7 @@ export interface DataTableColumn<T, K extends keyof T = keyof T> {
   cell: (props: CellProps<T, K>) => React.ReactNode
 }
 
-interface DataTableProps<T> {
+export interface DataTableProps<T extends Record<string, unknown> = Record<string, unknown>> {
   rawd?: PagedResponse<T> | DataTablePageView<T>
   columns: DataTableColumn<T>[]
   maxRecordsPerPage?: number
@@ -44,7 +45,7 @@ interface DataTableProps<T> {
   onFilterChange?: (filters: Record<string, string>) => void
   onPreviousPage?: (pageNumber: number) => void
   onNextPage?: (pageNumber: number) => void
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  colspan?: GridColSpan
 
   storageKey?: string
 }
@@ -405,7 +406,7 @@ const DataTable = <T extends Record<string, unknown>,>(props: DataTableProps<T>)
   }
 
   return (
-    <div className={`col-span-${colspan} flex flex-col h-full w-full relative`}>
+    <div className={`${colSpanClass(colspan)} flex flex-col h-full w-full relative`}>
       {columns[0] && (
         <div
           ref={filterMeasureRef}

@@ -1,5 +1,6 @@
 import { Copy, Dices, Eye, EyeOff } from 'lucide-react'
 import { ChangeEvent, FC, useRef, useState } from 'react'
+import type { GridColSpan } from '../../functions/tailwind'
 import { FieldContainer } from './FieldContainer'
 import { getInputClasses } from './editorStyles'
 
@@ -7,7 +8,7 @@ export type SecretDataSource = () => Promise<string | undefined>
 
 export interface SecretComponentProps {
   label: string
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  colspan?: GridColSpan
   errorText?: string
   value?: string
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void

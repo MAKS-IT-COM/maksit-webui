@@ -1,6 +1,7 @@
 import debounce from 'lodash/debounce'
 import { CircleX } from 'lucide-react'
 import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { GridColSpan } from '../../functions/tailwind'
 import { FieldContainer } from './FieldContainer'
 import { getInputClasses } from './editorStyles'
 
@@ -11,7 +12,7 @@ export interface SelectBoxComponentOption {
 
 interface SelectBoxComponentProps {
   label: string
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  colspan?: GridColSpan
   errorText?: string
   options?: SelectBoxComponentOption[]
 

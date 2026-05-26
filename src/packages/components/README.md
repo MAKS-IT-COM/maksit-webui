@@ -22,7 +22,6 @@ npm install react react-dom react-router-dom lucide-react @tanstack/react-table 
 | `Layout` | App chrome / navigation wrapper |
 | `Offcanvas` | Slide-over panel |
 | `LazyLoadTable` | Incrementally loaded table |
-| `VaultStyleDataTable`, `VaultStyleListSection` | Vault-style list layouts |
 | `EntityScopesSummary` | Entity scope permissions summary |
 | `Toast`, `addToast` | Toast notifications |
 | `FieldContainer` | Label + validation wrapper for fields |

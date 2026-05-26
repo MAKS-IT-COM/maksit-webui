@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, type ReactNode } from 'react'
 import { MainContainer } from './MainContainer'
 import { SideMenu, SideMenuProps } from './SideMenu'
 import { Container } from './Container'
@@ -9,7 +9,7 @@ import { Content } from './Content'
 interface LayoutProps {
     sideMenu: SideMenuProps
     header: HeaderProps
-    children: React.ReactNode
+    children: ReactNode
     footer: FooterProps
 }
 

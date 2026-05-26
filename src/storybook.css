@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+
+@source '../packages/components/src/**/*.tsx';
+@source './.storybook/**/*.tsx';
+@source './stories/**/*.tsx';

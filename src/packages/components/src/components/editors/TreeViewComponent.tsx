@@ -1,4 +1,6 @@
 import React, { useState, ReactNode } from 'react'
+import type { GridColSpan } from '../../functions/tailwind'
+import { FieldContainer } from './FieldContainer'
 
 interface TreeNode {
   id: string;
@@ -11,7 +13,7 @@ interface TreeNode {
 interface TreeViewProps {
   data: TreeNode[];
   label?: string;
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+  colspan?: GridColSpan;
 }
 
 const TreeViewComponent: React.FC<TreeViewProps> = (props) => {
@@ -75,10 +77,9 @@ const TreeViewComponent: React.FC<TreeViewProps> = (props) => {
   }
 
   return (
-    <div className={`col-span-${colspan}`}>
-      {label && <label className={'block text-gray-700 text-sm font-bold mb-2'}>{label}</label>}
+    <FieldContainer colspan={colspan} label={label}>
       <div className={'border p-4 rounded-md'}>{renderTree(data)}</div>
-    </div>
+    </FieldContainer>
   )
 }
 

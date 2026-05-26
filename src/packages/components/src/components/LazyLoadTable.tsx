@@ -1,17 +1,18 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, type ReactNode, useEffect, useRef, useState } from 'react'
+import { colSpanClass, type GridColSpan } from '../functions/tailwind'
 
 interface LazyLoadTableColumnProps {
     key: string
     title: string
     dataIndex: string
-    renderColumn?: (value: unknown) => React.ReactNode
+    renderColumn?: (value: unknown) => ReactNode
 }
 
 interface LazyLoadTableProps {
     data: Record<string, unknown>[]
     columns: LazyLoadTableColumnProps[]
     loadMore: () => void
-    colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+    colspan?: GridColSpan
 }
 
 const LazyLoadTable: FC<LazyLoadTableProps> = (props) => {
@@ -51,7 +52,7 @@ const LazyLoadTable: FC<LazyLoadTableProps> = (props) => {
   }
   
   return (
-    <div className={`col-span-${colspan}`}>
+    <div className={colSpanClass(colspan)}>
       <table className={'w-full border-collapse'}>
         <thead>
           <tr>

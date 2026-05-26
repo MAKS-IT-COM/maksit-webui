@@ -1,11 +1,12 @@
 import { FC, ReactNode, useCallback, useEffect } from 'react'
+import { colSpanClass, type GridColSpan } from '../functions/tailwind'
 
 export interface OffcanvasProps {
   children: ReactNode
   isOpen?: boolean
   onOpen?: () => void
   onClose?: () => void
-  colspan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  colspan?: GridColSpan
 }
 
 const Offcanvas: FC<OffcanvasProps> = (props) => {
@@ -30,7 +31,7 @@ const Offcanvas: FC<OffcanvasProps> = (props) => {
     else handleOnClose()
   }, [isOpen, handleOnOpen, handleOnClose])
 
-  const leftSpan = 12 - colspan
+  const leftSpan = (12 - colspan) as GridColSpan
 
   return (
     <div
@@ -42,10 +43,8 @@ const Offcanvas: FC<OffcanvasProps> = (props) => {
       ].join(' ')}
     >
       <div className={'grid grid-cols-12 h-full w-full'}>
-        {/* colonna di offset */}
-        <div className={`col-span-${leftSpan}`} />
-        {/* area principale */}
-        <div className={`col-span-${colspan} min-h-0`}>
+        <div className={colSpanClass(leftSpan)} aria-hidden={true} />
+        <div className={`${colSpanClass(colspan)} min-h-0 bg-white shadow-xl`}>
           {children}
         </div>
       </div>

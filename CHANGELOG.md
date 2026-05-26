@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.0] - 2026-05-25
+
+### Added
+
+- Storybook 10 catalog for `@maks-it.com/webui-components`: Tailwind v4, React Router decorator, autodocs, a11y addon, stories for all editors, DataTable (with **ClientSideInteractive** filters/pagination demo), Layout, and FormLayout (`FormContainer`, `FormHeader`, `FormContent`, `FormFooter`).
+- `npm run storybook` and `npm run build-storybook` from `src/`.
+
+### Changed
+
+- Storybook stories under `src/stories/components/` mirror `packages/components/src/components/` folder names (`editors`, `Toast`, …); sidebar titles use `components/<folder>/…`; `@webui/*` Vite aliases import package source without a build.
+
+### Removed
+
+- Unused `VaultStyleListSection`, `VaultStyleDataTable`, and `VaultStyleListFooter` (`components/list/`) — not consumed by vault or certs-ui; list screens use `DataTable` instead.
+
+### Fixed
+
+- Editor `colspan` uses static Tailwind `col-span-*` classes via `functions/tailwind/gridColSpan.ts` so Storybook and Vite builds apply the 12-column grid correctly.
+- Storybook 10 preview: Vite `esbuild` JSX set to `automatic` so decorators and stories no longer throw `React is not defined`.
+
 ## [v0.2.0] - 2026-05-24
 
 ### Added
