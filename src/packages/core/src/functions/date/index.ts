@@ -5,5 +5,14 @@ export { dateTimeToUtcIsoSchema } from './dateTimeToUtcIsoSchema'
 
 export {
   isValidISODateString,
-  formatISODateString
+  formatISODateString,
 }
+
+export {
+  parseISO,
+  formatISO,
+  format,
+  getDaysInMonth,
+  addMonths,
+  subMonths,
+} from 'date-fns'

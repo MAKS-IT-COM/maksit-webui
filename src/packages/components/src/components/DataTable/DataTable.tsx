@@ -3,8 +3,7 @@ import { AutoSizer, MultiGrid, GridCellProps } from 'react-virtualized'
 
 import { mapPagedToDataTable, type DataTablePageView, type PagedResponse } from '@maks-it.com/webui-core'
 import { Plus, Trash2, Edit } from 'lucide-react'
-import debounce from 'lodash/debounce'
-import { colSpanClass, type GridColSpan } from '../../functions/tailwind'
+import { debounce, colSpanClass, type GridColSpan } from '../../functions'
 
 
 interface FilterProps {

@@ -1,4 +1,5 @@
 import { useState, useEffect, FC } from 'react'
+import { createToastId } from './createToastId'
 
 // Define types for a toast
 interface Toast {
@@ -7,8 +8,6 @@ interface Toast {
     type: 'info' | 'success' | 'warning' | 'error';
     duration?: number;
 }
-
-const createToastId = (): string => crypto.randomUUID()
 
 const Toast: FC = () => {
   const [toasts, setToasts] = useState<Toast[]>([])

@@ -1,5 +1,5 @@
 import { FC, ReactNode } from 'react'
-import { colSpanClass, type GridColSpan } from '../../functions/tailwind'
+import { colSpanClass, type GridColSpan } from '../../functions'
 
 interface FieldContainerProps {
     colspan?: GridColSpan;

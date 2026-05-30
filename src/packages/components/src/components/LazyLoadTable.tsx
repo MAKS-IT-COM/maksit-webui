@@ -1,5 +1,5 @@
 import { FC, type ReactNode, useEffect, useRef, useState } from 'react'
-import { colSpanClass, type GridColSpan } from '../functions/tailwind'
+import { colSpanClass, type GridColSpan } from '../functions'
 
 interface LazyLoadTableColumnProps {
     key: string

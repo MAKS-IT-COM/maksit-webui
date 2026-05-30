@@ -2,6 +2,12 @@ import {
   isValidISODateString,
   formatISODateString,
   dateTimeToUtcIsoSchema,
+  parseISO,
+  formatISO,
+  format,
+  getDaysInMonth,
+  addMonths,
+  subMonths,
 } from './date'
 
 import {
@@ -47,6 +53,12 @@ export {
   isValidISODateString,
   formatISODateString,
   dateTimeToUtcIsoSchema,
+  parseISO,
+  formatISO,
+  format,
+  getDaysInMonth,
+  addMonths,
+  subMonths,
   deepCopy,
   deepDelta,
   deltaHasOperations,

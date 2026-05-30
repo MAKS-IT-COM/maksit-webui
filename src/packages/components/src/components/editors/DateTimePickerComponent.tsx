@@ -1,9 +1,16 @@
 import { ChangeEvent, FC, useState, useEffect, useRef } from 'react'
-import { parseISO, formatISO, format, getDaysInMonth, addMonths, subMonths } from 'date-fns'
+import {
+  parseISO,
+  formatISO,
+  format,
+  getDaysInMonth,
+  addMonths,
+  subMonths,
+} from '@maks-it.com/webui-core'
+import { CircleX } from 'lucide-react'
 import { ButtonComponent } from './ButtonComponent'
 import { TextBoxComponent } from './TextBoxComponent'
-import { CircleX } from 'lucide-react'
-import type { GridColSpan } from '../../functions/tailwind'
+import type { GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
 import { getInputClasses } from './editorStyles'
 

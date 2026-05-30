@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import debounce from 'lodash/debounce'
+import { debounce } from '../../functions'
 
 interface FilterPropsBase {
   filterId?: string

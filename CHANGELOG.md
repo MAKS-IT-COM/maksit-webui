@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.3.1] - 2026-05-30
+
+### Fixed
+
+- Toast IDs no longer use `crypto.randomUUID()` (requires HTTPS/localhost). IDs are generated with a counter + timestamp via `createToastId()` so toasts work over HTTP in Docker and other non-secure contexts.
+
+### Changed
+
+- `@maks-it.com/webui-components`: shared helpers (`debounce`, `colSpanClass`, `GridColSpan`) are imported from the `functions` barrel instead of subpaths.
+- `@maks-it.com/webui-core`: re-exports `date-fns` primitives (`parseISO`, `formatISO`, `format`, `getDaysInMonth`, `addMonths`, `subMonths`) for consumers.
+- `@maks-it.com/webui-components` `DateTimePickerComponent` imports date helpers from `@maks-it.com/webui-core` instead of `date-fns` directly.
+
+### Removed
+
+- `lodash` and `@types/lodash` from `@maks-it.com/webui-components`; filter debouncing uses a local `debounce()` helper.
+- Duplicate `date-fns` dependency from `@maks-it.com/webui-components` (`date-fns` remains on `@maks-it.com/webui-core` only).
+
 ## [v0.3.0] - 2026-05-25
 
 ### Added

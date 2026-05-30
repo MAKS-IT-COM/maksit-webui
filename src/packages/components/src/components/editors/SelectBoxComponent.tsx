@@ -1,7 +1,6 @@
-import debounce from 'lodash/debounce'
 import { CircleX } from 'lucide-react'
 import { ChangeEvent, FC, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { GridColSpan } from '../../functions/tailwind'
+import { debounce, type GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
 import { getInputClasses } from './editorStyles'
 

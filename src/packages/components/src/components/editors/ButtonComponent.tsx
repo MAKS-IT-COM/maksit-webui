@@ -1,6 +1,6 @@
 import { type FC, type MouseEvent, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { colSpanClass, type GridColSpan } from '../../functions/tailwind'
+import { colSpanClass, type GridColSpan } from '../../functions'
 
 interface CommonButtonProps {
   colspan?: GridColSpan;

@@ -19,7 +19,6 @@ export default defineConfig({
       'react-router-dom',
       'storybook/test',
       'lucide-react',
-      'lodash/debounce',
     ],
   },
   resolve: {

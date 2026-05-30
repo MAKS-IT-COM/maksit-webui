@@ -1,5 +1,5 @@
 import { FC, ReactNode, useCallback, useEffect } from 'react'
-import { colSpanClass, type GridColSpan } from '../functions/tailwind'
+import { colSpanClass, type GridColSpan } from '../functions'
 
 export interface OffcanvasProps {
   children: ReactNode

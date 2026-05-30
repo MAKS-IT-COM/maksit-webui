@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import type { GridColSpan } from '../../functions/tailwind'
+import type { GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
 
 interface RadioOption {

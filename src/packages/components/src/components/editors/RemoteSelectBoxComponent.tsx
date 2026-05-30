@@ -2,7 +2,7 @@ import { useState, useCallback, ChangeEvent, useEffect, useRef } from 'react'
 import type { PagedRequest } from '@maks-it.com/webui-contracts'
 import type { SearchResponseBase } from '@maks-it.com/webui-contracts'
 import { deepEqual } from '@maks-it.com/webui-core'
-import type { GridColSpan } from '../../functions/tailwind'
+import type { GridColSpan } from '../../functions'
 import { SelectBoxComponent } from './SelectBoxComponent'
 
 export type RemoteSelectSearchDataSource<TRequest extends PagedRequest> = (

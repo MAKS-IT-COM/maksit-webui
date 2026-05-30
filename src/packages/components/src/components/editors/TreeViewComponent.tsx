@@ -1,5 +1,5 @@
 import React, { useState, ReactNode } from 'react'
-import type { GridColSpan } from '../../functions/tailwind'
+import type { GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
 
 interface TreeNode {

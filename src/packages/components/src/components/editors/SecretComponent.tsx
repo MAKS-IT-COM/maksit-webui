@@ -1,6 +1,6 @@
 import { Copy, Dices, Eye, EyeOff } from 'lucide-react'
 import { ChangeEvent, FC, useRef, useState } from 'react'
-import type { GridColSpan } from '../../functions/tailwind'
+import type { GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
 import { getInputClasses } from './editorStyles'
 

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { colSpanClass, type GridColSpan } from '../../functions/tailwind'
+import { colSpanClass, type GridColSpan } from '../../functions'
 import { ButtonComponent } from './ButtonComponent'
 import { Trash2 } from 'lucide-react'
 

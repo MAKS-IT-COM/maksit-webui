@@ -1,5 +1,5 @@
 import { type ChangeEvent, type FC, useEffect, useRef } from 'react'
-import type { GridColSpan } from '../../functions/tailwind'
+import type { GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
 
 interface CheckBoxComponentProps {
