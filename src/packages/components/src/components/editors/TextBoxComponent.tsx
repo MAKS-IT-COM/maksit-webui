@@ -51,7 +51,7 @@ const TextBoxComponent: FC<TextBoxComponentProps> = (props) => {
   // Se il type è "textarea", comportamento invariato
   if (type === 'textarea') {
     return (
-      <FieldContainer colspan={colspan} label={label} errorText={errorText}>
+      <FieldContainer colspan={colspan} label={label} errorText={errorText} disabled={disabled} readOnly={readOnly}>
         <textarea
           value={value}
           onChange={handleOnChange}
@@ -68,7 +68,7 @@ const TextBoxComponent: FC<TextBoxComponentProps> = (props) => {
   const hasContent = String(value).length > 0
 
   return (
-    <FieldContainer colspan={colspan} label={label} errorText={errorText}>
+    <FieldContainer colspan={colspan} label={label} errorText={errorText} disabled={disabled} readOnly={readOnly}>
       {type === 'password' ? (
         // Wrapper che contiene input e bottone show/hide, ma bottone solo se c'è contenuto
         <div className={'relative'}>

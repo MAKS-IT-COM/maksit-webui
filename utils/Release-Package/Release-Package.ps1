@@ -132,6 +132,7 @@ $sharedPluginSettings = $engineContext
 #region Plugin Execution
 
 $releaseStageInitialized = $false
+$releaseHadPluginFailures = $false
 
 if ($plugins.Count -eq 0) {
     Write-Log -Level "WARN" -Message "No plugins configured in scriptsettings.json."
@@ -149,8 +150,14 @@ else {
             }
         }
 
-        $continueOnError = $pluginStageLabel -eq "release"
-        Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $sharedPluginSettings -PluginsDirectory $pluginsDir -ContinueOnError:$continueOnError
+        $continueOnError = $false
+        $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $sharedPluginSettings -PluginsDirectory $pluginsDir -ContinueOnError:$continueOnError
+        if (-not $pluginSucceeded) {
+            $releaseHadPluginFailures = $true
+            if (-not $continueOnError) {
+                break
+            }
+        }
     }
 }
 
@@ -163,7 +170,10 @@ if (-not $releaseStageInitialized) {
 
 #region Summary
 Write-Log -Level "OK" -Message "=================================================="
-if ($engineContext.PSObject.Properties.Name -contains 'skipPublishPlugins' -and $engineContext.skipPublishPlugins) {
+if ($releaseHadPluginFailures) {
+    Write-Log -Level "ERROR" -Message "RELEASE FAILED"
+}
+elseif ($engineContext.PSObject.Properties.Name -contains 'skipPublishPlugins' -and $engineContext.skipPublishPlugins) {
     Write-Log -Level "OK" -Message "RUN COMPLETE (publish skipped by ReleasePublishGuard)"
 }
 elseif ($engineContext.isNonReleaseBranch) {
@@ -177,6 +187,10 @@ Write-Log -Level "OK" -Message "================================================
 if ($engineContext.isNonReleaseBranch -and -not ($engineContext.PSObject.Properties.Name -contains 'skipPublishPlugins' -and $engineContext.skipPublishPlugins)) {
     $preferredReleaseBranch = Get-PreferredReleaseBranch -EngineContext $engineContext
     Write-Log -Level "INFO" -Message "For publish, use an allowed branch (see ReleasePublishGuard.branches), e.g. '$preferredReleaseBranch', and satisfy the guard requirements."
+}
+
+if ($releaseHadPluginFailures) {
+    exit 1
 }
 
 #endregion

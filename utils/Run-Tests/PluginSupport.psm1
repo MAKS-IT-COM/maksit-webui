@@ -340,16 +340,20 @@ function Invoke-ConfiguredPlugin {
         [string]$PluginsDirectory,
 
         [Parameter(Mandatory = $false)]
-        [bool]$ContinueOnError = $true
+        [bool]$ContinueOnError = $false
     )
 
     if (-not (Test-PluginRunnable -Plugin $Plugin -SharedSettings $SharedSettings -PluginsDirectory $PluginsDirectory -WriteLogs:$true)) {
-        return
+        if ($Plugin.enabled) {
+            return $false
+        }
+
+        return $true
     }
 
     if ((Test-IsPublishPlugin -Plugin $Plugin) -and ($SharedSettings.PSObject.Properties.Name -contains 'skipPublishPlugins') -and $SharedSettings.skipPublishPlugins) {
         Write-Log -Level "INFO" -Message "Skipping plugin '$($Plugin.name)' (ReleasePublishGuard suppressed publish)."
-        return
+        return $true
     }
 
     $pluginModulePath = Resolve-PluginModulePath -Plugin $Plugin -PluginsDirectory $PluginsDirectory
@@ -364,12 +368,11 @@ function Invoke-ConfiguredPlugin {
 
         & $invokeCommand -Settings $pluginSettings
         Write-Log -Level "OK" -Message "  Plugin '$($Plugin.name)' completed."
+        return $true
     }
     catch {
         Write-Log -Level "ERROR" -Message "  Plugin '$($Plugin.name)' failed: $($_.Exception.Message)"
-        if (-not $ContinueOnError) {
-            exit 1
-        }
+        return $false
     }
 }
 

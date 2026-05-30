@@ -23,3 +23,13 @@ export function getInputClasses(options: InputClassOptions): string {
       : 'bg-white' + (readOnly ? ' text-gray-500 cursor-text select-text' : '')
   return [inputBaseClasses, border, state, extra].filter(Boolean).join(' ')
 }
+
+/** Checkbox/radio wrappers: muted when disabled, non-interactive cursor when disabled or read-only. */
+export function getInactiveControlClasses(options: { disabled?: boolean; readOnly?: boolean } = {}): string {
+  const { disabled = false, readOnly = false } = options
+  const inactive = disabled || readOnly
+  return [
+    disabled ? 'opacity-50' : '',
+    inactive ? 'cursor-default' : 'cursor-pointer',
+  ].filter(Boolean).join(' ')
+}

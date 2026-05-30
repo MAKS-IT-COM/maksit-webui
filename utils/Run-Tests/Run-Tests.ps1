@@ -67,10 +67,25 @@ if ($configuredPlugins.Count -eq 0) {
     exit 0
 }
 
+$testHadPluginFailures = $false
+
 foreach ($plugin in $configuredPlugins) {
-    Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $engineContext -PluginsDirectory $pluginsDir -ContinueOnError:$false
+    $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $engineContext -PluginsDirectory $pluginsDir -ContinueOnError:$false
+    if (-not $pluginSucceeded) {
+        $testHadPluginFailures = $true
+        break
+    }
 }
 
 Write-Log -Level "OK" -Message "=================================================="
-Write-Log -Level "OK" -Message "TEST RUN COMPLETE"
+if ($testHadPluginFailures) {
+    Write-Log -Level "ERROR" -Message "TEST RUN FAILED"
+}
+else {
+    Write-Log -Level "OK" -Message "TEST RUN COMPLETE"
+}
 Write-Log -Level "OK" -Message "=================================================="
+
+if ($testHadPluginFailures) {
+    exit 1
+}

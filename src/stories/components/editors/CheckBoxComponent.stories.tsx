@@ -40,6 +40,14 @@ export const WithError: Story = {
   },
 }
 
+export const Disabled: Story = {
+  args: {
+    label: 'Send notifications',
+    value: true,
+    disabled: true,
+  },
+}
+
 export const TogglesOnClick: Story = {
   args: {
     label: 'Enable feature',

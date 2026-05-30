@@ -13,6 +13,8 @@ Canonical source: this folder in **maksit-repoutils**. Product repositories refr
 | `ReleaseContext.psm1` | Resolves semver via `Resolve-ReleaseVersion` from `DotNetReleaseVersion.projectFiles` (first `.csproj` `<Version>`) or `NpmReleaseVersion.packageJsonPath`. |
 | `EngineSupport.psm1` | Warn-only dirty-tree preflight; default `context.tag` = `v{version}` from the configured version plugin; `Initialize-ReleaseStageContext` sets `releaseDir` only. |
 
+Shared module `../ChangelogSupport.psm1` (repo `src/`) parses release notes for the GitHub plugin: only `## [semver] - YYYY-MM-DD` version lines (Keep a Changelog). The latest header must match `context.version` from the version plugin.
+
 ## Plugins
 
 `CorePlugins/` — e.g. `DotNetReleaseVersion`, `NpmReleaseVersion`, `NpmBuild`, `NpmPublish`, `DockerPush`, `HelmPush`, `ReleasePublishGuard`. Optional `CustomPlugins/`.

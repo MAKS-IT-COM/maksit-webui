@@ -8,7 +8,9 @@
 .DESCRIPTION
     This plugin validates GitHub CLI access, resolves the target
     repository, and creates the configured GitHub release using the
-    shared release artifacts and extracted release notes.
+    shared release artifacts and release notes from CHANGELOG.md.
+    Release notes must use Keep a Changelog headers: ## [semver] - YYYY-MM-DD
+    (see ChangelogSupport.psm1).
 #>
 
 if (-not (Get-Command Import-PluginDependency -ErrorAction SilentlyContinue)) {
@@ -46,32 +48,6 @@ function Get-GitHubRepositoryInternal {
     throw "Could not parse GitHub repo from source: $repoSource. Configure plugins[].repository with 'owner/repo' or a GitHub URL."
 }
 
-function Get-ChangelogVersionHeaderPatternInternal {
-    # Keep a Changelog: ## [1.0.0] - 2026-05-24, bare ## 1.0.0 - 2026-05-24, or legacy ## v1.0.0
-    return '(?m)^##\s+(?:\[(\d+\.\d+\.\d+)\]|v(\d+\.\d+\.\d+)|(\d+\.\d+\.\d+)(?:\s*-\s*\d{4}-\d{2}-\d{2})?\s*$)'
-}
-
-function Get-LatestChangelogVersionInternal {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$ReleaseNotesContent
-    )
-
-    $match = [regex]::Match($ReleaseNotesContent, (Get-ChangelogVersionHeaderPatternInternal))
-    if (-not $match.Success) {
-        return $null
-    }
-
-    foreach ($groupIndex in 1..3) {
-        $version = $match.Groups[$groupIndex].Value
-        if (-not [string]::IsNullOrEmpty($version)) {
-            return $version
-        }
-    }
-
-    return $null
-}
-
 function Get-ReleaseNotesInternal {
     param(
         [Parameter(Mandatory = $true)]
@@ -87,9 +63,9 @@ function Get-ReleaseNotesInternal {
     }
 
     $releaseNotesContent = Get-Content $ReleaseNotesFile -Raw
-    $releaseNotesVersion = Get-LatestChangelogVersionInternal -ReleaseNotesContent $releaseNotesContent
+    $releaseNotesVersion = Get-LatestChangelogVersion -ReleaseNotesContent $releaseNotesContent
     if ([string]::IsNullOrWhiteSpace($releaseNotesVersion)) {
-        throw "No version entry found in the configured release notes source."
+        throw "No version entry found in the configured release notes source. Expected Keep a Changelog header: ## [semver] - YYYY-MM-DD."
     }
 
     if ($releaseNotesVersion -ne $Version) {
@@ -99,17 +75,14 @@ function Get-ReleaseNotesInternal {
     Write-Log -Level "OK" -Message "  Release notes version matches: v$releaseNotesVersion"
 
     Write-Log -Level "STEP" -Message "Extracting release notes..."
-    $escapedVersion = [regex]::Escape($Version)
-    $nextHeaderPattern = '(?m)^##\s+(?:\[\d+\.\d+\.\d+\]|v\d+\.\d+\.\d+|\d+\.\d+\.\d+(?:\s*-\s*\d{4}-\d{2}-\d{2})?\s*$)'
-    $pattern = "(?ms)^##\s+(?:\[$escapedVersion\]|v$escapedVersion|$escapedVersion(?:\s*-\s*\d{4}-\d{2}-\d{2})?).*?(?=$nextHeaderPattern|\Z)"
-    $match = [regex]::Match($releaseNotesContent, $pattern)
+    $section = Get-ChangelogReleaseNotesSection -ReleaseNotesContent $releaseNotesContent -Version $Version
 
-    if (-not $match.Success) {
-        throw "Release notes entry for version $Version not found."
+    if ([string]::IsNullOrWhiteSpace($section)) {
+        throw "Release notes entry for version $Version not found. Expected header: ## [$Version] - YYYY-MM-DD."
     }
 
     Write-Log -Level "OK" -Message "  Release notes extracted."
-    return $match.Value.Trim()
+    return $section
 }
 
 function Invoke-Plugin {
@@ -120,6 +93,7 @@ function Invoke-Plugin {
 
     Import-PluginDependency -ModuleName "Logging" -RequiredCommand "Write-Log"
     Import-PluginDependency -ModuleName "ScriptConfig" -RequiredCommand "Assert-Command"
+    Import-PluginDependency -ModuleName "ChangelogSupport" -RequiredCommand "Get-LatestChangelogVersion"
 
     $pluginSettings = $Settings
     $sharedSettings = $Settings.context

@@ -1,6 +1,7 @@
 import { type ChangeEvent, type FC, useEffect, useRef } from 'react'
 import type { GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
+import { getInactiveControlClasses } from './editorStyles'
 
 interface CheckBoxComponentProps {
     colspan?: GridColSpan;
@@ -38,14 +39,16 @@ const CheckBoxComponent: FC<CheckBoxComponentProps> = (props) => {
   }
 
   return (
-    <FieldContainer colspan={colspan} label={label} errorText={errorText}>
-      <input
-        type={'checkbox'}
-        checked={value}
-        onChange={handleOnChange}
-        className={`mr-2 leading-tight ${errorText ? 'border-red-500' : ''}`}
-        disabled={disabled}
-      />
+    <FieldContainer colspan={colspan} label={label} errorText={errorText} disabled={disabled}>
+      <label className={`inline-flex items-center ${getInactiveControlClasses({ disabled })}`}>
+        <input
+          type={'checkbox'}
+          checked={value}
+          onChange={handleOnChange}
+          className={`mr-2 leading-tight ${errorText ? 'border-red-500' : ''}`}
+          disabled={disabled}
+        />
+      </label>
     </FieldContainer>
   )
 }

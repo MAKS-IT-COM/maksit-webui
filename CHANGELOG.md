@@ -4,7 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v0.3.1] - 2026-05-30
+## [0.3.2] - 2026-05-30
+
+### Fixed
+
+- Disabled and read-only editors now show consistent muted styling: `CheckBoxComponent` uses `opacity-50` when disabled; `FieldContainer` grays field labels when inactive; checkbox, radio, text, select, date, and secret fields share `getInactiveControlClasses()`.
+- Added `tsup` to workspace root `devDependencies` so `npm ci` + `npm run build` resolve the CLI on Windows (subpackage-only hoisting was not always on `PATH` for nested workspace scripts).
+
+### Added
+
+- Storybook **Disabled** story for `CheckBoxComponent`.
+
+## [0.3.1] - 2026-05-30
 
 ### Fixed
 
@@ -21,7 +32,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `lodash` and `@types/lodash` from `@maks-it.com/webui-components`; filter debouncing uses a local `debounce()` helper.
 - Duplicate `date-fns` dependency from `@maks-it.com/webui-components` (`date-fns` remains on `@maks-it.com/webui-core` only).
 
-## [v0.3.0] - 2026-05-25
+## [0.3.0] - 2026-05-25
 
 ### Added
 
@@ -41,7 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Editor `colspan` uses static Tailwind `col-span-*` classes via `functions/tailwind/gridColSpan.ts` so Storybook and Vite builds apply the 12-column grid correctly.
 - Storybook 10 preview: Vite `esbuild` JSX set to `automatic` so decorators and stories no longer throw `React is not defined`.
 
-## [v0.2.0] - 2026-05-24
+## [0.2.0] - 2026-05-24
 
 ### Added
 
@@ -59,7 +70,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - `uuid` runtime dependency from `@maks-it.com/webui-components`.
 
-## [v0.1.0] - 2026-05-24
+## [0.1.0] - 2026-05-24
 
 ### Added
 

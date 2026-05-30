@@ -66,7 +66,7 @@ const SecretComponent: FC<SecretComponentProps> = ({
   const actionButtonClass = 'p-1 text-gray-600 hover:text-gray-800 bg-white'
 
   return (
-    <FieldContainer colspan={colspan} label={label} errorText={errorText}>
+    <FieldContainer colspan={colspan} label={label} errorText={errorText} readOnly={readOnly}>
       <div className={'relative'}>
         <input
           type={showPassword ? 'text' : 'password'}

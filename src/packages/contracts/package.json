@@ -1,6 +1,6 @@
 {
   "name": "@maks-it.com/webui-contracts",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Shared TypeScript contracts for MaksIT WebUI apps",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -18,7 +18,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.build.json",
+    "build": "npx tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.build.json",
     "test": "jest --config ../../jest.config.cjs --testPathPatterns packages/contracts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",

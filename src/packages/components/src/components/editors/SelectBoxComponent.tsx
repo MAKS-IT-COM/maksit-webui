@@ -154,7 +154,7 @@ const SelectBoxComponent: FC<SelectBoxComponentProps> = (props) => {
   }
 
   return (
-    <FieldContainer colspan={colspan} label={label} errorText={errorText}>
+    <FieldContainer colspan={colspan} label={label} errorText={errorText} disabled={disabled} readOnly={readOnly}>
       <div className={'relative'}>
 
         <div className={'relative'}>

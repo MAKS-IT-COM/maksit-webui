@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import type { GridColSpan } from '../../functions'
 import { FieldContainer } from './FieldContainer'
+import { getInactiveControlClasses } from './editorStyles'
 
 interface RadioOption {
   value: string
@@ -47,15 +48,13 @@ const RadioGroupComponent: React.FC<RadioGroupComponentProps> = (props) => {
   }
 
   return (
-    <FieldContainer colspan={colspan} label={label} errorText={errorText}>
+    <FieldContainer colspan={colspan} label={label} errorText={errorText} disabled={disabled} readOnly={readOnly}>
       <div className={'flex flex-col'}>
         {options.map(option => {
-          // Use default cursor (arrow) if disabled or readOnly, else pointer
-          const isInactive = disabled || readOnly
           return (
             <label
               key={option.value}
-              className={`flex items-center mb-2 ${disabled ? 'opacity-50' : ''} ${isInactive ? 'cursor-default' : 'cursor-pointer'}`}
+              className={`flex items-center mb-2 ${getInactiveControlClasses({ disabled, readOnly })}`}
             >
               <input
                 type={'radio'}
