@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2026-05-31
+
+### Changed
+
+- Migrated `utils/` to maksit-repoutils **1.0.14** layout under `utils/src/` (`Invoke-ReleasePackage`, `Invoke-TestEngine`, `Update-RepoUtils`). Product `scriptSettings.json` paths updated for the deeper engine folders.
+
+### Added
+
+- `@maks-it.com/webui-core`: `useWebUiHub` React hook for JWT-authenticated SignalR hubs — connection state (`idle` / `connecting` / `connected` / `reconnecting` / `disconnected`), optional automatic reconnect, and typed hub event handlers.
+- `resolveHubUrl` helper (absolute URLs unchanged; relative paths resolve against `window.location.origin`).
+- `@microsoft/signalr` peer dependency on `@maks-it.com/webui-core`.
+
+### Changed
+
+- All `@maks-it.com/webui-*` packages published at `0.3.3` with aligned workspace dependency ranges.
+- Jest tests for core and contracts moved from co-located `src/**/*.test.ts` to `packages/*/test/`; root `jest.config.cjs` roots updated accordingly.
+- `@maks-it.com/webui-core` README documents SignalR install and `useWebUiHub` usage.
+
 ## [0.3.2] - 2026-05-30
 
 ### Fixed

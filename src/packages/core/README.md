@@ -7,7 +7,7 @@ Depends on `@maks-it.com/webui-contracts`. Install peer dependencies in the host
 ## Install
 
 ```bash
-npm install @maks-it.com/webui-core @maks-it.com/webui-contracts axios react zod
+npm install @maks-it.com/webui-core @maks-it.com/webui-contracts @microsoft/signalr axios react zod
 ```
 
 ## Highlights
@@ -20,6 +20,7 @@ npm install @maks-it.com/webui-core @maks-it.com/webui-contracts axios react zod
 | DataTable | `mapPagedToDataTable`, `extractPropFilter`, `DataTablePageView` |
 | ACL | `parseAclEntry`, `parseAclEntries` |
 | HTTP | `createWebUiHttpClient`, auth interceptors, Problem Details helpers |
+| SignalR | `useWebUiHub` |
 | Enum / flags | `enumToArr`, `flagsToString`, `hasFlag`, `toggleFlag` |
 | Identity storage | `readIdentity`, `writeIdentity`, `removeIdentity` |
 
@@ -37,6 +38,25 @@ function MyForm() {
     validationSchema: schema,
   })
   // ...
+}
+```
+
+## Example — SignalR hub
+
+```tsx
+import { readIdentity, useWebUiHub } from '@maks-it.com/webui-core'
+
+function JobProgressPanel({ canSubscribe }: { canSubscribe: boolean }) {
+  const [progress, setProgress] = useState<number | undefined>()
+
+  const { connectionState } = useWebUiHub({
+    hubUrl: '/hubs/jobs',
+    enabled: canSubscribe,
+    accessToken: () => readIdentity()?.token,
+    events: { progressUpdated: setProgress },
+  })
+
+  // connectionState: idle | connecting | connected | reconnecting | disconnected
 }
 ```
 

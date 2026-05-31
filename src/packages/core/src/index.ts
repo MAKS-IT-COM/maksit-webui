@@ -1,5 +1,6 @@
 export * from './functions'
 export * from './types'
 export * from './http'
+export * from './signalr'
 export { readIdentity, writeIdentity, removeIdentity } from './localStorage/identity'
 export { useFormState } from './hooks/useFormState'

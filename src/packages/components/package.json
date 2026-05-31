@@ -1,6 +1,6 @@
 {
   "name": "@maks-it.com/webui-components",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Shared React components for MaksIT WebUI apps",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -33,8 +33,8 @@
     "directory": "src/packages/components"
   },
   "dependencies": {
-    "@maks-it.com/webui-contracts": "^0.3.2",
-    "@maks-it.com/webui-core": "^0.3.2"
+    "@maks-it.com/webui-contracts": "^0.3.3",
+    "@maks-it.com/webui-core": "^0.3.3"
   },
   "peerDependencies": {
     "@tanstack/react-table": "^8.0.0",

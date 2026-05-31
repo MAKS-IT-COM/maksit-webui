@@ -6,6 +6,8 @@
   },
   "include": [
     "packages/core/src/**/*.ts",
-    "packages/contracts/src/**/*.ts"
+    "packages/core/test/**/*.ts",
+    "packages/contracts/src/**/*.ts",
+    "packages/contracts/test/**/*.ts"
   ]
 }

@@ -50,13 +50,13 @@ npm view @maks-it.com/webui-components version
 
 ## Release pipeline (recommended)
 
-Use **`utils/Release-Package/Release-Package.bat`** (or `pwsh utils/Release-Package/Release-Package.ps1`):
+Use **`utils/src/Invoke-ReleasePackage.bat`** (or `pwsh utils/src/engines/release/Invoke-ReleasePackage.ps1`):
 
 1. Bump version in `src/package.json` (or tag drives `NpmReleaseVersion`).
 2. Tag `HEAD` with exact semver, e.g. `git tag v0.2.0 && git push origin v0.2.0`.
 3. Set `NPMJS_MAKS_IT` and run the release engine.
 
-`utils/Release-Package/scriptsettings.json` runs `NpmReleaseVersion`, `NpmBuild`, `ReleasePublishGuard`, optional `GitHub`, then `NpmPublish` in dependency order.
+`utils/src/engines/release/scriptSettings.json` runs `NpmReleaseVersion`, `NpmBuild`, `ReleasePublishGuard`, optional `GitHub`, then `NpmPublish` in dependency order.
 
 ## After publish — Certs UI / Vault
 

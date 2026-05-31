@@ -1,6 +1,6 @@
 {
   "name": "@maks-it.com/webui-contracts",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Shared TypeScript contracts for MaksIT WebUI apps",
   "type": "module",
   "main": "./dist/index.cjs",
