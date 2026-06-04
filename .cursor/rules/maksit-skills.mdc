@@ -1,0 +1,13 @@
+---
+description: Load MaksIT agent skills from homelab (deterministic)
+globs: "**/*.{ts,tsx,md,ps1,json}"
+alwaysApply: true
+---
+
+# MaksIT skills (maksit-webui)
+
+1. `E:\Users\maksym\source\repos\private\homelab\ai\skills\common\react-typescript\SKILL.md`
+2. `E:\Users\maksym\source\repos\private\homelab\ai\skills\common\maksit-repo-maintenance\SKILL.md`
+3. `E:\Users\maksym\source\repos\private\homelab\ai\skills\local-ollama\SKILL.md` — local Ollama offload (`@local-ollama`)
+
+Manifest: `.cursor/maksit-skills.json`.
