@@ -1,7 +1,7 @@
 {
   "name": "maksit-webui",
   "private": true,
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Shared React UI library for MaksIT Certs UI and Vault WebUI",
   "workspaces": [
     "packages/*"

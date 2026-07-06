@@ -437,7 +437,7 @@ export const deepDelta = <T extends Record<string, unknown>>(
         const roleBecameNull = backupRole !== null && formRole === null
         if (roleBecameNull) {
           const removeItem = {} as DeltaArrayItem<U>
-          ;(removeItem as PlainObject)[idFieldKey] = fid as IdLike
+          ;(removeItem as PlainObject)[getIdFieldForItem(backupItem)] = fid as IdLike
           removeItem.operations = { [COLLECTION_ITEM_OPERATION]: PatchOperation.RemoveFromCollection }
           arrayDelta.push(removeItem)
           continue
@@ -446,7 +446,8 @@ export const deepDelta = <T extends Record<string, unknown>>(
 
       // 1.e) Field-level diff
       const itemDeltaBase = {} as (PlainObject & OperationBag & { id?: U['id'] })
-      ;(itemDeltaBase as PlainObject)[getIdFieldForItem(formItem)] = fid as IdLike
+      const identityField = getIdFieldForItem(formItem)
+      ;(itemDeltaBase as PlainObject)[identityField] = fid as IdLike
 
       calculateDelta(
         formItem as PlainObject,
@@ -454,7 +455,9 @@ export const deepDelta = <T extends Record<string, unknown>>(
         itemDeltaBase
       )
 
-      const hasMeaningfulChanges = Object.keys(itemDeltaBase).some(k => k !== idFieldKey)
+      const hasMeaningfulChanges = Object.keys(itemDeltaBase).some(
+        k => k !== identityField && k !== 'operations'
+      )
       if (hasMeaningfulChanges) {
         arrayDelta.push(itemDeltaBase as DeltaArrayItem<U>)
       }

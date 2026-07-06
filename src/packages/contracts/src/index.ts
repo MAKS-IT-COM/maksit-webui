@@ -32,3 +32,5 @@ export { RefreshTokenRequestSchema } from './identity/login/RefreshTokenRequest'
 export type { LogoutRequest } from './identity/logout/LogoutRequest'
 export { LogoutRequestSchema } from './identity/logout/LogoutRequest'
 export type { LogoutResponse } from './identity/logout/LogoutResponse'
+
+export * from './oauth'

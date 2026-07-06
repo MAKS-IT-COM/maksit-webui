@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] - 2026-07-06
+
+### Added
+
+- **OAuth / external identity providers** (extracted from FiPlan.Anywhere):
+  - `@maks-it.com/webui-contracts`: `LoginProviderExternal`, `EmailProtocol`, `ServerAuthenticationMethod`, `MsalViewModel`, `IdpRedeemLoginResponse`, `MailboxOAuthPending`, and mailbox OAuth session/query constants.
+  - `@maks-it.com/webui-core`: `startIdpRedirect`, `shouldSkipIdpLoginCallback`, `useIdpLoginCallback`, mailbox OAuth redirect helpers (`collectMailboxOAuthProtocols`, `startMailboxOAuthRedirect`, `useMailboxOAuthReturn`), and `removeParamFromUrl` / `removeParamsFromUrl`.
+  - `@maks-it.com/webui-components`: `ExternalLoginButtons`, `IdpLoginCallbackHandler`, `MailboxOAuthReturnHandler`.
+- `@maks-it.com/webui-core`: `HOSTNAMES_ARRAY_POLICY` for Certs UI account hostname PATCH collections (`identityKey` / `idFieldKey`: `hostname`).
+- `deepDelta` regression tests for Certs/Vault consumer forms — `HOSTNAMES_ARRAY_POLICY`, `ENTITY_SCOPES_ARRAY_POLICY`, `VERSIONS_ARRAY_POLICY`, advanced `ArrayPolicy` options (`rootKey`, `childArrayKeys`, `deleteItemWhenRoleRemoved`).
+
+### Changed
+
+- All `@maks-it.com/webui-*` packages versioned at **0.3.4** with aligned workspace dependency ranges.
+- RepoUtils entry points and docs: `utils/src/` → `utils/` (`Invoke-TestEngine.bat`, `Invoke-ReleasePackage-Single.bat`, `Update-RepoUtils.bat`; README and `assets/docs/NPM_PUBLISH.md` updated).
+- Release secret env vars documented as logical names **`Npm`** and **`GitHub`** (see `utils/engines/release/scriptSettings.json`).
+- Package READMEs document OAuth exports and PATCH collection policies.
+
+### Fixed
+
+- `deepDelta` identifiable-array diff: role-null removals emit the correct identity field (`id` vs `_deltaId`); item deltas are omitted when only `operations` changed (no spurious id-only placeholders).
+
 ## [0.3.3] - 2026-05-31
 
 ### Changed

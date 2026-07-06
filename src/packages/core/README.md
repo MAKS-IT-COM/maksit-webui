@@ -22,7 +22,9 @@ npm install @maks-it.com/webui-core @maks-it.com/webui-contracts @microsoft/sign
 | HTTP | `createWebUiHttpClient`, auth interceptors, Problem Details helpers |
 | SignalR | `useWebUiHub` |
 | Enum / flags | `enumToArr`, `flagsToString`, `hasFlag`, `toggleFlag` |
+| PATCH collections | `ENTITY_SCOPES_ARRAY_POLICY`, `HOSTNAMES_ARRAY_POLICY`, `VERSIONS_ARRAY_POLICY` |
 | Identity storage | `readIdentity`, `writeIdentity`, `removeIdentity` |
+| OAuth / IdP | `startIdpRedirect`, `useIdpLoginCallback`, `collectMailboxOAuthProtocols`, `startMailboxOAuthRedirect`, `useMailboxOAuthReturn` |
 
 ## Example — form state
 

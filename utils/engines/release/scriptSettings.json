@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "Release Package Script Settings",
+  "description": "maksit-webui: npm workspace publish (@maks-it.com/webui-*). Semver from NpmReleaseVersion (src/package.json).",
+  "plugins": [
+    {
+      "name": "NpmReleaseVersion",
+      "stageLabel": "build",
+      "enabled": true,
+      "packageJsonPath": "..\\..\\..\\src\\package.json",
+      "syncWorkspaceVersions": true
+    },
+    {
+      "name": "NpmBuild",
+      "stageLabel": "build",
+      "enabled": true,
+      "workspaceRoot": "..\\..\\..\\src",
+      "useCi": true,
+      "buildScript": "build"
+    },
+    {
+      "name": "ReleasePublishGuard",
+      "stageLabel": "release",
+      "enabled": true,
+      "branches": [
+        "main"
+      ],
+      "requireExactTagOnHead": true,
+      "tagVersionMustMatchReleaseVersion": true,
+      "whenRequirementsNotMet": "skip",
+      "requireCleanWorkingTree": false,
+      "ensureTagOnRemote": true,
+      "remoteName": "origin"
+    },
+    {
+      "name": "NpmPack",
+      "stageLabel": "release",
+      "enabled": true,
+      "workspaceRoot": "..\\..\\..\\src",
+      "publishOrder": [
+        "@maks-it.com/webui-contracts",
+        "@maks-it.com/webui-core",
+        "@maks-it.com/webui-components"
+      ]
+    },
+    {
+      "name": "GitHub",
+      "stageLabel": "release",
+      "enabled": true,
+      "githubSecret": "GitHub",
+      "repository": "https://github.com/MAKS-IT-COM/maksit-webui",
+      "releaseNotesFile": "..\\..\\..\\CHANGELOG.md",
+      "releaseTitlePattern": "Release {version}"
+    },
+    {
+      "name": "NpmPublish",
+      "stageLabel": "release",
+      "enabled": true,
+      "npmSecret": "Npm",
+      "registry": "https://registry.npmjs.org",
+      "access": "public",
+      "workspaceRoot": "..\\..\\..\\src",
+      "publishOrder": [
+        "@maks-it.com/webui-contracts",
+        "@maks-it.com/webui-core",
+        "@maks-it.com/webui-components"
+      ]
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import {
 } from './deepDelta'
 import {
   ENTITY_SCOPES_ARRAY_POLICY,
+  HOSTNAMES_ARRAY_POLICY,
   VERSIONS_ARRAY_POLICY,
 } from './patchCollectionPolicies'
 import { deepEqualArrays, deepEqual } from './deepEqual'
@@ -17,6 +18,7 @@ export {
   deepDelta,
   deltaHasOperations,
   ENTITY_SCOPES_ARRAY_POLICY,
+  HOSTNAMES_ARRAY_POLICY,
   VERSIONS_ARRAY_POLICY,
   deepEqualArrays,
   deepEqual,

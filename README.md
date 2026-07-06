@@ -12,7 +12,7 @@ Shared React UI library for **maksit-certs-ui** and **maksit-vault** WebUI apps.
 | `@maks-it.com/webui-core` | Utilities (`deepDelta`, enum helpers, ACL parsers) and `useFormState` |
 | `@maks-it.com/webui-components` | React components, layout, editors, DataTable, auth shell |
 
-Source lives under `src/` (npm workspaces). Release automation lives under `utils/src/` (from [maksit-repoutils](https://github.com/MAKS-IT-COM/maksit-repoutils)).
+Source lives under `src/` (npm workspaces). Release automation lives under `utils/` (from [maksit-repoutils](https://github.com/MAKS-IT-COM/maksit-repoutils)).
 
 ## Local development
 
@@ -26,25 +26,25 @@ npm run storybook
 
 **Storybook** (`npm run storybook`) runs a local catalog of `@maks-it.com/webui-components` with Tailwind, React Router, autodocs, a11y checks, and **Vitest component tests** (testing widget + `npm run test-storybook`). Stories live under `src/stories/components/` (mirroring component folders); see `src/stories/README.md` for story conventions and testing.
 
-Tests and coverage badges: **`utils/src/Invoke-TestEngine.bat`** (plugin config in `utils/src/engines/test/scriptSettings.json`; uses `NpmJestTest`).
+Tests and coverage badges: **`utils\Invoke-TestEngine.bat`** (plugin config in `utils\engines\test\scriptSettings.json`; uses `NpmJestTest`).
 
 ## Release to npmjs
 
-1. Set **`NPMJS_MAKS_IT`** to your npm automation token (same pattern as `NUGET_MAKS_IT` for NuGet).
+1. Set **`Npm`** environment variable to your npm automation token (logical secret name in `scriptSettings.json`).
 2. Bump **`src/package.json`** `version` (and tag `vX.Y.Z` on `main` when using the publish guard).
-3. Run **`utils/src/Invoke-ReleasePackage.bat`** (or `pwsh utils/src/engines/release/Invoke-ReleasePackage.ps1`).
+3. Run **`utils\Invoke-ReleasePackage-Single.bat`** (or `pwsh utils\engines\release\Invoke-ReleasePackage.ps1`).
 
-Configured plugins (see `utils/src/engines/release/scriptSettings.json`):
+Configured plugins (see `utils\engines\release\scriptSettings.json`):
 
 | Plugin | Role |
 |--------|------|
 | `NpmReleaseVersion` | Read semver from `src/package.json`; sync `packages/*/package.json` |
 | `NpmBuild` | `npm ci` + `npm run build` |
 | `ReleasePublishGuard` | Branch/tag checks before publish |
-| `GitHub` | GitHub release (optional; needs `GITHUB_MAKS_IT_COM`) |
+| `GitHub` | GitHub release (optional; set `GitHub` env var) |
 | `NpmPublish` | Publish workspace packages in dependency order |
 
-Refresh shared utils from repoutils: **`utils/src/Update-RepoUtils.bat`**.
+Refresh shared utils from repoutils: **`utils\Update-RepoUtils.bat`**.
 
 ## Consume in product repos
 

@@ -17,7 +17,7 @@ Published packages:
 3. Create an **Automation** token (recommended) or Granular Access token with **Publish** on `@maks-it.com/*`:
    - https://www.npmjs.com/settings/maks-it.com/tokens
 4. Store the token for release tooling:
-   - **CI / Release-Package:** set env var `NPMJS_MAKS_IT` to the token value (same pattern as `NUGET_MAKS_IT`).
+   - **CI / release engine:** set environment variable **`Npm`** (logical secret name in `scriptSettings.json`).
    - **Local one-off publish:** `npm login` or a user-level `~/.npmrc` entry:
      ```
      //registry.npmjs.org/:_authToken=YOUR_TOKEN
@@ -50,13 +50,13 @@ npm view @maks-it.com/webui-components version
 
 ## Release pipeline (recommended)
 
-Use **`utils/src/Invoke-ReleasePackage.bat`** (or `pwsh utils/src/engines/release/Invoke-ReleasePackage.ps1`):
+Use **`utils\Invoke-ReleasePackage-Single.bat`** (or `pwsh utils\engines\release\Invoke-ReleasePackage.ps1`):
 
 1. Bump version in `src/package.json` (or tag drives `NpmReleaseVersion`).
 2. Tag `HEAD` with exact semver, e.g. `git tag v0.2.0 && git push origin v0.2.0`.
-3. Set `NPMJS_MAKS_IT` and run the release engine.
+3. Set `$env:Npm` and run the release engine.
 
-`utils/src/engines/release/scriptSettings.json` runs `NpmReleaseVersion`, `NpmBuild`, `ReleasePublishGuard`, optional `GitHub`, then `NpmPublish` in dependency order.
+`utils\engines\release\scriptSettings.json` runs `NpmReleaseVersion`, `NpmBuild`, `ReleasePublishGuard`, optional `GitHub`, then `NpmPublish` in dependency order.
 
 ## After publish — Certs UI / Vault
 

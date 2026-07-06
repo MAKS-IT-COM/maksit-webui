@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "Helm Uninstall Script Settings",
+  "description": "HelmUninstall inherits namespace, charts, and bgpServices from HelmSelfDeploy in engines/release/scriptSettings.json unless inheritFromRelease is false.",
+  "plugins": [
+    {
+      "name": "HelmUninstall",
+      "stageLabel": "uninstall",
+      "enabled": false
+    }
+  ]
+}
+

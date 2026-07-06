@@ -25,6 +25,9 @@ npm install react react-dom react-router-dom lucide-react @tanstack/react-table 
 | `EntityScopesSummary` | Entity scope permissions summary |
 | `Toast`, `addToast` | Toast notifications |
 | `FieldContainer` | Label + validation wrapper for fields |
+| `ExternalLoginButtons` | Google/Microsoft (or custom) external login buttons |
+| `IdpLoginCallbackHandler` | Headless handler for `?code=` app login OAuth return |
+| `MailboxOAuthReturnHandler` | Headless handler for mailbox OAuth multi-protocol return |
 
 ## Example — DataTable
 

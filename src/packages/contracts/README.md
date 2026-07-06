@@ -19,6 +19,7 @@ npm install @maks-it.com/webui-contracts zod
 | API errors | `ProblemDetails` |
 | Search | `SearchResponseBase`, `SearchEntityScopeEntry` |
 | Identity | `LoginRequest` / `LoginRequestSchema`, `LoginResponse`, `RefreshTokenRequest`, `LogoutRequest`, `Claims` |
+| OAuth / IdP | `LoginProviderExternal`, `EmailProtocol`, `ServerAuthenticationMethod`, `IdpRedeemLoginResponse`, `MailboxOAuthPending`, mailbox OAuth constants |
 | Misc | `TrngResponse`, `RequestModelBase`, `ResponseModelBase` |
 
 ## Example

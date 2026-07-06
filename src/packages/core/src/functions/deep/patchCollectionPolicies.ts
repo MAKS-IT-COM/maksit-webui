@@ -36,7 +36,17 @@ function entityScopeFallback(item: Record<string, unknown>): string {
 }
 
 /**
- * Array policy for user/API key `entityScopes` payloads passed to {@link deepDelta}.
+ * Array policy for account `hostnames` collections (Certs UI `EditAccount`).
+ *
+ * Items are matched by `hostname` rather than server `id`; the delta payload uses
+ * `hostname` as the identity field.
+ */
+export const HOSTNAMES_ARRAY_POLICY: ArrayPolicy = {
+  identityKey: 'hostname',
+  idFieldKey: 'hostname',
+}
+
+/**
  *
  * Uses `_deltaId` in the delta payload when items lack a server `id`, avoiding
  * invalid Guid values in the `id` field expected by the API.
