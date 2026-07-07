@@ -2,23 +2,28 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/packages/core/test', '<rootDir>/packages/contracts/test'],
+  roots: ['<rootDir>/test'],
   testMatch: ['**/*.test.ts'],
   collectCoverageFrom: [
-    'packages/core/src/**/*.ts',
-    'packages/contracts/src/**/*.ts',
+    'contracts/**/*.ts',
+    'core/**/*.ts',
   ],
   coverageDirectory: 'coverage',
   coverageReporters: ['json-summary', 'text'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
-    '^@maks-it.com/webui-contracts$': '<rootDir>/packages/contracts/src/index.ts',
+    '^@webui/contracts$': '<rootDir>/contracts/index.ts',
+    '^@webui/contracts/(.*)$': '<rootDir>/contracts/$1',
+    '^@webui/core$': '<rootDir>/core/index.ts',
+    '^@webui/core/(.*)$': '<rootDir>/core/$1',
+    '^@webui/components$': '<rootDir>/components/index.ts',
+    '^@webui/components/(.*)$': '<rootDir>/components/$1',
   },
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tsconfig.jest.json',
+        tsconfig: '<rootDir>/tsconfig.json',
       },
     ],
   },

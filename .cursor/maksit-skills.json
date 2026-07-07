@@ -2,6 +2,7 @@
     "$schema": "homelab-maksit-skills-manifest-v1",
     "skillsRoot": "E:\\Users\\maksym\\source\\repos\\private\\homelab\\ai\\skills",
     "skills": [
+      "common/maksit-webui",
       "common/react-typescript",
       "common/maksit-repo-maintenance",
       "local-ollama"

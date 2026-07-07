@@ -1,19 +1,19 @@
-# Publishing `@maks-it.com/webui-*` to npm
+# Publishing `@maks-it.com/webui` to npm
 
-Packages are published under the **`@maks-it.com` scope** to [registry.npmjs.org](https://registry.npmjs.org), managed from the [maks-it.com npm org](https://www.npmjs.com/settings/maks-it.com/packages).
+The library is published under the **`@maks-it.com` scope** to [registry.npmjs.org](https://registry.npmjs.org), managed from the [maks-it.com npm org](https://www.npmjs.com/settings/maks-it.com/packages).
 
-Published packages:
+Published package:
 
 | Package | npm |
 |---------|-----|
-| `@maks-it.com/webui-contracts` | https://www.npmjs.com/package/@maks-it.com/webui-contracts |
-| `@maks-it.com/webui-core` | https://www.npmjs.com/package/@maks-it.com/webui-core |
-| `@maks-it.com/webui-components` | https://www.npmjs.com/package/@maks-it.com/webui-components |
+| `@maks-it.com/webui` | https://www.npmjs.com/package/@maks-it.com/webui |
+
+> **Note:** `@maks-it.com/webui-contracts`, `@maks-it.com/webui-core`, and `@maks-it.com/webui-components` were merged into `@maks-it.com/webui` starting at **0.4.0**. Migrate host apps to the single package.
 
 ## One-time npm setup
 
 1. Sign in at https://www.npmjs.com/ with the **maks-it.com** org account.
-2. Confirm the **`@maks-it.com` scope** exists under [Packages](https://www.npmjs.com/settings/maks-it.com/packages). The org name `maks-it.com` is the npm scope for scoped packages.
+2. Confirm the **`@maks-it.com` scope** exists under [Packages](https://www.npmjs.com/settings/maks-it.com/packages).
 3. Create an **Automation** token (recommended) or Granular Access token with **Publish** on `@maks-it.com/*`:
    - https://www.npmjs.com/settings/maks-it.com/tokens
 4. Store the token for release tooling:
@@ -23,9 +23,9 @@ Published packages:
      //registry.npmjs.org/:_authToken=YOUR_TOKEN
      ```
 
-Scoped packages must use **`--access public`** (already configured in each package `publishConfig`).
+Scoped packages must use **`--access public`** (already configured in package `publishConfig`).
 
-## Manual first publish (0.1.0)
+## Manual publish
 
 From the repo root:
 
@@ -33,19 +33,13 @@ From the repo root:
 cd src
 npm ci
 npm run build
-npm publish -w @maks-it.com/webui-contracts --access public
-npm publish -w @maks-it.com/webui-core --access public
-npm publish -w @maks-it.com/webui-components --access public
+npm publish -w @maks-it.com/webui --access public
 ```
-
-Order matters: **contracts → core → components**.
 
 Verify:
 
 ```powershell
-npm view @maks-it.com/webui-contracts version
-npm view @maks-it.com/webui-core version
-npm view @maks-it.com/webui-components version
+npm view @maks-it.com/webui version
 ```
 
 ## Release pipeline (recommended)
@@ -53,19 +47,17 @@ npm view @maks-it.com/webui-components version
 Use **`utils\Invoke-ReleasePackage-Single.bat`** (or `pwsh utils\engines\release\Invoke-ReleasePackage.ps1`):
 
 1. Bump version in `src/package.json` (or tag drives `NpmReleaseVersion`).
-2. Tag `HEAD` with exact semver, e.g. `git tag v0.2.0 && git push origin v0.2.0`.
+2. Tag `HEAD` with exact semver, e.g. `git tag v0.4.0 && git push origin v0.4.0`.
 3. Set `$env:Npm` and run the release engine.
 
-`utils\engines\release\scriptSettings.json` runs `NpmReleaseVersion`, `NpmBuild`, `ReleasePublishGuard`, optional `GitHub`, then `NpmPublish` in dependency order.
+`utils\engines\release\scriptSettings.json` runs `NpmReleaseVersion`, `NpmBuild`, `ReleasePublishGuard`, optional `GitHub`, then `NpmPublish`.
 
 ## After publish — Certs UI / Vault
 
 In each WebUI app (`MaksIT.WebUI/package.json`):
 
 ```json
-"@maks-it.com/webui-contracts": "^0.1.0",
-"@maks-it.com/webui-core": "^0.1.0",
-"@maks-it.com/webui-components": "^0.1.0"
+"@maks-it.com/webui": "^0.4.0"
 ```
 
 Then refresh the lockfile:

@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-07-07
+
+### Changed
+
+- **Breaking:** merged `@maks-it.com/webui-contracts`, `@maks-it.com/webui-core`, and `@maks-it.com/webui-components` into a single published package **`@maks-it.com/webui`**. Host apps install one package and import everything from `@maks-it.com/webui` (see `assets/docs/NPM_CONSUMPTION.md` migration notes).
+- **Breaking:** `src/` is now the npm package root — `src/package.json` publishes as `@maks-it.com/webui`; npm workspaces and `src/packages/*` nesting removed.
+- Source layout: `contracts/`, `core/`, and `components/` live directly under `src/` (internal organization only; no subpath exports).
+- Release pipeline (`utils/engines/release/scriptSettings.json`) publishes one package; `NpmReleaseVersion.syncWorkspaceVersions` disabled.
+- Jest, Vitest, and Storybook configs updated for the flat `src/` layout (`@webui/*` aliases point at `src/{contracts,core,components}`).
+- VS Code/Cursor: TypeScript SDK and integrated terminal default to `src/`.
+- `src/coverage/` explicitly gitignored; generated coverage is no longer tracked (README badges remain under `assets/badges/`).
+
+### Removed
+
+- `@maks-it.com/webui-contracts`, `@maks-it.com/webui-core`, and `@maks-it.com/webui-components` as separate npm packages (superseded by `@maks-it.com/webui`).
+- `src/packages/` workspace layout and per-package `package.json` files.
+- Repo-root `tsconfig.json` and stray `node_modules/` (tooling and dependencies live under `src/` only).
+
+## [0.3.5] - 2026-07-06
+
+### Fixed
+
+- `ENTITY_SCOPES_ARRAY_POLICY`: synthetic identity is now `{entityId}-{entityType}` (not including `scope`), so adding an application scope alongside an existing organization scope produces a correct `AddToCollection` delta, and permission changes on id-less rows update in place via `_deltaId`.
+
 ## [0.3.4] - 2026-07-06
 
 ### Added

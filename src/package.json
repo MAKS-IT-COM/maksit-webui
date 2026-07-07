@@ -1,10 +1,21 @@
 {
-  "name": "maksit-webui",
-  "private": true,
-  "version": "0.3.4",
-  "description": "Shared React UI library for MaksIT Certs UI and Vault WebUI",
-  "workspaces": [
-    "packages/*"
+  "name": "@maks-it.com/webui",
+  "version": "0.4.0",
+  "description": "Shared contracts, utilities, and React components for MaksIT WebUI apps",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
   ],
   "engines": {
     "node": ">=20.19"
@@ -15,30 +26,58 @@
     "test-exclude": "^8.0.0"
   },
   "scripts": {
-    "build": "npm run build -w @maks-it.com/webui-contracts && npm run build -w @maks-it.com/webui-core && npm run build -w @maks-it.com/webui-components",
+    "build": "npx tsup",
     "test": "jest --config jest.config.cjs",
     "test:coverage": "jest --config jest.config.cjs --coverage",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "clean": "npm run clean --workspaces --if-present",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "prepublishOnly": "npm run build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build -o storybook-static",
     "test-storybook": "vitest --project storybook run",
     "test-storybook:watch": "vitest --project storybook",
     "test-storybook:coverage": "vitest --project storybook run --coverage"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MAKS-IT-COM/maksit-webui.git",
+    "directory": "src"
+  },
+  "dependencies": {
+    "date-fns": "^4.3.0"
+  },
+  "peerDependencies": {
+    "@microsoft/signalr": "^8.0.0",
+    "@tanstack/react-table": "^8.0.0",
+    "axios": "^1.16.0",
+    "lucide-react": "^1.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-router-dom": "^7.0.0",
+    "react-virtualized": "^9.22.0",
+    "zod": "^4.4.0"
+  },
   "devDependencies": {
+    "@microsoft/signalr": "^8.0.7",
     "@storybook/addon-a11y": "^10.4.1",
     "@storybook/addon-docs": "^10.4.1",
     "@storybook/addon-vitest": "^10.4.1",
     "@storybook/react-vite": "^10.4.1",
     "@tailwindcss/vite": "^4.3.0",
+    "@tanstack/react-table": "^8.21.3",
     "@types/jest": "^30.0.0",
     "@types/mockdate": "^2.0.0",
     "@types/node": "^22.19.19",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "@types/react-virtualized": "^9.22.3",
     "@vitest/browser-playwright": "^4.1.7",
     "@vitest/coverage-v8": "^4.1.7",
+    "axios": "^1.16.1",
     "jest": "^30.4.2",
     "lucide-react": "^1.16.0",
     "mockdate": "^3.0.5",
@@ -48,12 +87,15 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.1",
+    "react-virtualized": "^9.22.6",
     "storybook": "^10.4.1",
     "tailwindcss": "^4.3.0",
     "ts-jest": "^29.4.11",
     "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
     "vite": "^6.4.2",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.7",
+    "zod": "^4.4.3"
   },
   "author": "MaksIT",
   "license": "MIT",

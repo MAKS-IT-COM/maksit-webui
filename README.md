@@ -4,15 +4,13 @@
 
 Shared React UI library for **maksit-certs-ui** and **maksit-vault** WebUI apps.
 
-## Packages
+## Package
 
 | npm package | Description |
 |-------------|-------------|
-| `@maks-it.com/webui-contracts` | Shared TypeScript contracts (paging, gallery types, patch ops, scopes) |
-| `@maks-it.com/webui-core` | Utilities (`deepDelta`, enum helpers, ACL parsers) and `useFormState` |
-| `@maks-it.com/webui-components` | React components, layout, editors, DataTable, auth shell |
+| `@maks-it.com/webui` | Contracts, utilities (`deepDelta`, hooks, HTTP, SignalR), and React components |
 
-Source lives under `src/` (npm workspaces). Release automation lives under `utils/` (from [maksit-repoutils](https://github.com/MAKS-IT-COM/maksit-repoutils)).
+Source lives under `src/` (`@maks-it.com/webui` — `contracts/`, `core/`, `components/`). Release automation lives under `utils/`.
 
 ## Local development
 
@@ -24,7 +22,7 @@ npm test
 npm run storybook
 ```
 
-**Storybook** (`npm run storybook`) runs a local catalog of `@maks-it.com/webui-components` with Tailwind, React Router, autodocs, a11y checks, and **Vitest component tests** (testing widget + `npm run test-storybook`). Stories live under `src/stories/components/` (mirroring component folders); see `src/stories/README.md` for story conventions and testing.
+**Storybook** (`npm run storybook`) runs a local component catalog with Tailwind, React Router, autodocs, a11y checks, and **Vitest component tests** (testing widget + `npm run test-storybook`). Stories live under `src/stories/components/`; see `src/stories/README.md`.
 
 Tests and coverage badges: **`utils\Invoke-TestEngine.bat`** (plugin config in `utils\engines\test\scriptSettings.json`; uses `NpmJestTest`).
 
@@ -38,21 +36,21 @@ Configured plugins (see `utils\engines\release\scriptSettings.json`):
 
 | Plugin | Role |
 |--------|------|
-| `NpmReleaseVersion` | Read semver from `src/package.json`; sync `packages/*/package.json` |
+| `NpmReleaseVersion` | Read semver from `src/package.json` |
 | `NpmBuild` | `npm ci` + `npm run build` |
 | `ReleasePublishGuard` | Branch/tag checks before publish |
 | `GitHub` | GitHub release (optional; set `GitHub` env var) |
-| `NpmPublish` | Publish workspace packages in dependency order |
+| `NpmPublish` | Publish `@maks-it.com/webui` |
 
 Refresh shared utils from repoutils: **`utils\Update-RepoUtils.bat`**.
 
 ## Consume in product repos
 
 ```bash
-npm install @maks-it.com/webui-contracts @maks-it.com/webui-core @maks-it.com/webui-components
+npm install @maks-it.com/webui
 ```
 
-Wrap the app with `WebUiProvider` and pass axios/redux adapters — see [assets/docs/NPM_CONSUMPTION.md](assets/docs/NPM_CONSUMPTION.md).
+See [assets/docs/NPM_CONSUMPTION.md](assets/docs/NPM_CONSUMPTION.md).
 
 ## License
 

@@ -191,27 +191,27 @@ function Invoke-ContainerImagePush {
 
                 $primaryRef = "${baseName}:$($imageTags[0])"
                 Write-Log -Level 'STEP' -Message "Building $primaryRef via $engineName ..."
-                $buildExitCode = Invoke-ContainerEngine -Engine $engine build -t $primaryRef -f $dockerfilePath $imgContextPath
-                if ($buildExitCode -ne 0) {
-                    throw "Container build failed for $primaryRef"
+                Invoke-ContainerEngine -Engine $engine build -t $primaryRef -f $dockerfilePath $imgContextPath
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Container build failed for $primaryRef (exit code: $LASTEXITCODE)"
                 }
 
                 Write-Log -Level 'STEP' -Message "Pushing $primaryRef via $engineName ..."
-                $pushExitCode = Invoke-ContainerEngine -Engine $engine push $primaryRef
-                if ($pushExitCode -ne 0) {
-                    throw "Container push failed for $primaryRef"
+                Invoke-ContainerEngine -Engine $engine push $primaryRef
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Container push failed for $primaryRef (exit code: $LASTEXITCODE)"
                 }
 
                 for ($ti = 1; $ti -lt $imageTags.Count; $ti++) {
                     $aliasRef = "${baseName}:$($imageTags[$ti])"
                     Write-Log -Level 'STEP' -Message "Tagging and pushing $aliasRef via $engineName ..."
-                    $tagExitCode = Invoke-ContainerEngine -Engine $engine tag $primaryRef $aliasRef
-                    if ($tagExitCode -ne 0) {
-                        throw "Container tag failed: $primaryRef -> $aliasRef"
+                    Invoke-ContainerEngine -Engine $engine tag $primaryRef $aliasRef
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Container tag failed: $primaryRef -> $aliasRef (exit code: $LASTEXITCODE)"
                     }
-                    $aliasPushExitCode = Invoke-ContainerEngine -Engine $engine push $aliasRef
-                    if ($aliasPushExitCode -ne 0) {
-                        throw "Container push failed for $aliasRef"
+                    Invoke-ContainerEngine -Engine $engine push $aliasRef
+                    if ($LASTEXITCODE -ne 0) {
+                        throw "Container push failed for $aliasRef (exit code: $LASTEXITCODE)"
                     }
                 }
             }

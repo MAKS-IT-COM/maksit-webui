@@ -1,13 +1,13 @@
 # Storybook stories
 
-Stories are **not** published with `@maks-it.com/webui-components`. They live here so the library package stays free of Storybook-only code.
+Stories are **not** published with `@maks-it.com/webui`. They live here so the library package stays free of Storybook-only code.
 
 ## Layout (mirrors package source)
 
-`stories/components/` maps one-to-one to `packages/components/src/components/`:
+`stories/components/` maps one-to-one to `components/components/`:
 
 ```
-packages/components/src/components/     stories/components/
+components/components/     stories/components/
 ├── editors/                            ├── editors/
 │   └── *.tsx                           │   └── *.stories.tsx
 ├── Toast/                              ├── Toast/
@@ -42,7 +42,7 @@ From `stories/components/<folder>/`, helpers are always `../../helpers/`.
 
 | Topic | Practice |
 |--------|----------|
-| **Folder** | Same name as under `packages/components/src/components/` |
+| **Folder** | Same name as under `components/components/` |
 | **File name** | Same as component: `ButtonComponent.stories.tsx` |
 | **Title** | `components/<folder>/<StoryName>` — mirrors the folder path |
 | **Autodocs** | `tags: ['autodocs']` on meta |
@@ -63,7 +63,7 @@ Storybook **component tests** run stories as Vitest tests in a real browser (Chr
 1. Start Storybook: `npm run storybook`
 2. Use the **testing widget** at the bottom of the sidebar to run all tests, or use a story’s context menu to run tests for one story/component.
 3. Enable **Accessibility** in the widget to include a11y checks (requires `@storybook/addon-a11y`, already configured).
-4. Enable **Coverage** in the widget to generate a coverage report for component source under `packages/components/src/`.
+4. Enable **Coverage** in the widget to generate a coverage report for component source under `components/`.
 5. Stories with **`play` functions** show results in the **Interactions** panel.
 
 ### From the CLI

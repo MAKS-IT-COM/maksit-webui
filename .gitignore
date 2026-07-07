@@ -267,6 +267,8 @@ __pycache__/
 node_modules/
 dist/
 coverage/
+src/coverage/
+src/dist-test-dts/
 storybook-static/
 *.tsbuildinfo
 .DS_Store

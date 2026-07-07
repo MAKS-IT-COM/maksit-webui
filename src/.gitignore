@@ -1,0 +1,6 @@
+coverage/
+dist/
+dist-test-dts/
+storybook-static/
+*.tsbuildinfo
+*.tgz

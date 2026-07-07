@@ -9,6 +9,12 @@ const srcDir = join(storybookDir, '..')
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.@(ts|tsx)'],
   staticDirs: ['../public'],
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      tsconfigPath: join(srcDir, 'tsconfig.json'),
+    },
+  },
   addons: [
     getAbsolutePath("@storybook/addon-docs"),
     getAbsolutePath("@storybook/addon-a11y"),
@@ -29,9 +35,9 @@ const config: StorybookConfig = {
       ...config.resolve,
       alias: {
         ...(config.resolve?.alias as Record<string, string> | undefined),
-        '@webui/components': join(srcDir, 'packages/components/src'),
-        '@webui/contracts': join(srcDir, 'packages/contracts/src'),
-        '@webui/core': join(srcDir, 'packages/core/src'),
+        '@webui/components': join(srcDir, 'components'),
+        '@webui/contracts': join(srcDir, 'contracts'),
+        '@webui/core': join(srcDir, 'core'),
       },
     }
     return config

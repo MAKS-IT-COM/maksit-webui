@@ -89,7 +89,7 @@ function New-EngineContext {
     $resolvedVersion = Resolve-ReleaseVersion -Plugins $Plugins -ScriptDir $ScriptDir
     $version = $resolvedVersion.version
     $versionSource = $resolvedVersion.source
-    $releaseRelative = '..\..\..\release'
+    $releaseRelative = '..\..\..\releases'
     $artifactsDirectory = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir $releaseRelative))
 
     $currentBranch = Get-CurrentBranch

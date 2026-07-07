@@ -76,6 +76,12 @@ function Invoke-Plugin {
         throw "NpmPublish plugin requires non-empty 'publishOrder' (workspace package names)."
     }
 
+    Import-Module (Join-Path $PSScriptRoot 'NpmPackageSupport.psm1') -Force
+    $useWorkspaces = Test-NpmWorkspacesConfigured -WorkspaceRoot $workspaceRoot
+    if (-not $useWorkspaces -and $publishOrder.Count -gt 1) {
+        throw "NpmPublish plugin requires npm workspaces when publishing more than one package."
+    }
+
     if ($dryRun) {
         foreach ($packageName in $publishOrder) {
             Write-Log -Level "INFO" -Message "Dry run: would publish npm package '$packageName' to $registry"
@@ -106,7 +112,14 @@ registry=$registry
 
         foreach ($packageName in $publishOrder) {
             Write-Log -Level "STEP" -Message "Publishing npm package '$packageName'..."
-            npm publish -w $packageName --access $access --userconfig $tempNpmRcPath
+            if ($useWorkspaces) {
+                npm publish -w $packageName --access $access --userconfig $tempNpmRcPath
+            }
+            else {
+                Assert-NpmRootPackageName -WorkspaceRoot $workspaceRoot -ExpectedPackageName $packageName
+                npm publish --access $access --userconfig $tempNpmRcPath
+            }
+
             if ($LASTEXITCODE -ne 0) {
                 throw "Failed to publish npm package '$packageName'."
             }

@@ -23,9 +23,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@webui/components': path.join(srcDir, 'packages/components/src'),
-      '@webui/contracts': path.join(srcDir, 'packages/contracts/src'),
-      '@webui/core': path.join(srcDir, 'packages/core/src'),
+      '@webui/components': path.join(srcDir, 'components'),
+      '@webui/contracts': path.join(srcDir, 'contracts'),
+      '@webui/core': path.join(srcDir, 'core'),
     },
   },
   esbuild: {
@@ -51,7 +51,7 @@ export default defineConfig({
             provider: 'v8',
             reporter: ['text', 'html', 'json-summary'],
             reportsDirectory: './coverage/storybook',
-            include: ['packages/components/src/**/*.{ts,tsx}'],
+            include: ['components/**/*.{ts,tsx}'],
           },
         },
       },

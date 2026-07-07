@@ -278,6 +278,11 @@ function Get-ContainerEngineDisplayName {
 }
 
 function Invoke-ContainerEngine {
+    <#
+    .SYNOPSIS
+        Runs a container CLI command. Callers must read $LASTEXITCODE immediately after — do not
+        assign the function result to infer success (native stdout can mix with a returned exit code).
+    #>
     param(
         [Parameter(Mandatory = $true)]
         [hashtable]$Engine,
@@ -287,7 +292,6 @@ function Invoke-ContainerEngine {
     )
 
     & $Engine.Executable @ArgumentList
-    return $LASTEXITCODE
 }
 
 function Invoke-ContainerEngineWithInput {

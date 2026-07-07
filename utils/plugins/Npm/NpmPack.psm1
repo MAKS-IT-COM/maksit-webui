@@ -79,6 +79,12 @@ function Invoke-Plugin {
         throw "NpmPack plugin requires non-empty 'publishOrder' or 'packOrder' (workspace package names)."
     }
 
+    Import-Module (Join-Path $PSScriptRoot 'NpmPackageSupport.psm1') -Force
+    $useWorkspaces = Test-NpmWorkspacesConfigured -WorkspaceRoot $workspaceRoot
+    if (-not $useWorkspaces -and $packOrder.Count -gt 1) {
+        throw "NpmPack plugin requires npm workspaces when packing more than one package."
+    }
+
     if (-not (Test-Path $artifactsDirectory -PathType Container)) {
         New-Item -ItemType Directory -Path $artifactsDirectory | Out-Null
     }
@@ -89,7 +95,14 @@ function Invoke-Plugin {
     try {
         foreach ($packageName in $packOrder) {
             Write-Log -Level "STEP" -Message "Packing npm package '$packageName'..."
-            $tarballName = (npm pack -w $packageName --pack-destination $artifactsDirectory 2>$null | Select-Object -Last 1)
+            if ($useWorkspaces) {
+                $tarballName = (npm pack -w $packageName --pack-destination $artifactsDirectory 2>$null | Select-Object -Last 1)
+            }
+            else {
+                Assert-NpmRootPackageName -WorkspaceRoot $workspaceRoot -ExpectedPackageName $packageName
+                $tarballName = (npm pack --pack-destination $artifactsDirectory 2>$null | Select-Object -Last 1)
+            }
+
             if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace([string]$tarballName)) {
                 throw "npm pack failed for '$packageName'."
             }
@@ -97,6 +110,11 @@ function Invoke-Plugin {
             $tarballPath = Join-Path $artifactsDirectory ([string]$tarballName).Trim()
             if (-not (Test-Path $tarballPath -PathType Leaf)) {
                 throw "Could not locate pack output for '$packageName' at: $tarballPath"
+            }
+
+            $strayTarballPath = Join-Path $workspaceRoot ([string]$tarballName).Trim()
+            if ((Test-Path $strayTarballPath -PathType Leaf) -and $strayTarballPath -ne $tarballPath) {
+                Remove-Item -LiteralPath $strayTarballPath -Force -ErrorAction SilentlyContinue
             }
 
             Write-Log -Level "OK" -Message "  Package ready: $tarballPath"

@@ -6,8 +6,13 @@ alwaysApply: true
 
 # MaksIT skills (maksit-webui)
 
-1. `E:\Users\maksym\source\repos\private\homelab\ai\skills\common\react-typescript\SKILL.md`
-2. `E:\Users\maksym\source\repos\private\homelab\ai\skills\common\maksit-repo-maintenance\SKILL.md`
-3. `E:\Users\maksym\source\repos\private\homelab\ai\skills\local-ollama\SKILL.md` — local Ollama offload (`@local-ollama`)
+1. `E:\Users\maksym\source\repos\private\homelab\ai\skills\common\maksit-webui\SKILL.md` — `@maks-it.com/webui` ↔ **MaksIT.Core** + **maksit-identity-hub** + product backends (PATCH, OAuth, ACL)
+2. `E:\Users\maksym\source\repos\private\homelab\ai\skills\common\react-typescript\SKILL.md`
+3. `E:\Users\maksym\source\repos\private\homelab\ai\skills\common\maksit-repo-maintenance\SKILL.md`
+4. `E:\Users\maksym\source\repos\private\homelab\ai\skills\local-ollama\SKILL.md` — `@local-ollama`
+
+Before changing `src/` library source: read **maksit-webui** skill; grep **maksit-core** and **maksit-identity-hub** as needed. Run `npm run build` in `src/` after source changes.
+
+Shortcuts: `c:\Users\maksym\Desktop\maksit-core.lnk`, `c:\Users\maksym\Desktop\maksit-identity-hub.lnk`
 
 Manifest: `.cursor/maksit-skills.json`.

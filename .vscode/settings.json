@@ -1,4 +1,6 @@
 {
   "typescript.tsdk": "src/node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "terminal.integrated.cwd": "${workspaceFolder}/src",
+  "npm.packageManager": "npm"
 }
