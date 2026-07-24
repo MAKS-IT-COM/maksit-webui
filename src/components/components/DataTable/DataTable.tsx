@@ -128,6 +128,33 @@ const DataTable = <T extends Record<string, unknown>,>(props: DataTableProps<T>)
     }
   }, [colWidths, storageKey])
 
+  // Keep widths in sync when column definitions change (e.g. parent swaps tables without remounting).
+  useEffect(() => {
+    const expected = columns.length + 1
+    setColWidths((prev) => {
+      if (prev.length === expected && prev.every((w) => typeof w === 'number' && Number.isFinite(w)))
+        return prev
+
+      const defaults = [DEFAULT_ACTION_WIDTH, ...columns.map(() => DEFAULT_COL_WIDTH)]
+      if (storageKey) {
+        try {
+          const stored = localStorage.getItem(storageKey)
+          if (stored) {
+            const parsed = JSON.parse(stored)
+            if (Array.isArray(parsed) && parsed.length === expected && parsed.every((w) => typeof w === 'number' && Number.isFinite(w)))
+              return parsed
+            localStorage.removeItem(storageKey)
+          }
+        }
+        catch {
+          // fall through to defaults
+        }
+      }
+
+      return defaults
+    })
+  }, [columns.length, storageKey])
+
   useEffect(() => {
     const el = filterMeasureRef.current
     if (!el || columns.length === 0) return
@@ -429,7 +456,7 @@ const DataTable = <T extends Record<string, unknown>,>(props: DataTableProps<T>)
               ref={gridRef}
               cellRenderer={cellRenderer}
               columnCount={columns.length + 1}
-              columnWidth={({ index }) => colWidths[index]}
+              columnWidth={({ index }) => colWidths[index] ?? DEFAULT_COL_WIDTH}
               fixedColumnCount={1}
               fixedRowCount={HEADER_ROWS}
               height={height}

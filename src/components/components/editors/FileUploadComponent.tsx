@@ -1,36 +1,42 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { colSpanClass, type GridColSpan } from '../../functions'
 import { ButtonComponent } from './ButtonComponent'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Upload } from 'lucide-react'
 
 interface FileUploadComponentProps {
   label?: string
   colspan?: GridColSpan
   multiple?: boolean
+  /** Comma-separated accept list for the file input (e.g. `.pdf,image/*`). */
+  accept?: string
   files?: File[]
   onChange?: (files: File[]) => void
   disabled?: boolean
+  /** When true (default), the control accepts drag-and-drop. */
+  droppable?: boolean
 }
 
 const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
   label = 'Select files',
   colspan = 6,
   multiple = true,
+  accept,
   files,
   onChange,
   disabled = false,
+  droppable = true,
 }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [showPopup, setShowPopup] = useState(false)
   const [popupPos, setPopupPos] = useState<{x: number, y: number}>({x: 0, y: 0})
+  const [dragActive, setDragActive] = useState(false)
   const popupRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const dragDepthRef = useRef(0)
 
-  // Focus popup when it opens
   React.useEffect(() => {
-    if (showPopup && popupRef.current) {
+    if (showPopup && popupRef.current)
       popupRef.current.focus()
-    }
   }, [showPopup])
 
   const areFilesEqual = (left: File[], right: File[]) =>
@@ -46,66 +52,127 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
 
   const displayFiles = files ?? selectedFiles
 
-  // Keep native input in sync for controlled resets.
   React.useEffect(() => {
     if (files !== undefined && files.length === 0 && inputRef.current)
       inputRef.current.value = ''
   }, [files])
 
+  const applyFiles = useCallback((nextFiles: File[]) => {
+    if (files === undefined)
+      setSelectedFiles(nextFiles)
+
+    if (!areFilesEqual(nextFiles, displayFiles))
+      onChange?.(nextFiles)
+  }, [displayFiles, files, onChange])
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const nextFiles = e.target.files ? Array.from(e.target.files) : []
-
-    if (files === undefined) {
-      setSelectedFiles(nextFiles)
-    }
-
-    if (!areFilesEqual(nextFiles, displayFiles)) {
-      onChange?.(nextFiles)
-    }
+    applyFiles(nextFiles)
   }
 
   const handleClear = () => {
-    if (files === undefined) {
+    if (files === undefined)
       setSelectedFiles([])
-    }
 
-    if (inputRef.current) inputRef.current.value = ''
+    if (inputRef.current)
+      inputRef.current.value = ''
 
-    if (displayFiles.length > 0) {
+    if (displayFiles.length > 0)
       onChange?.([])
-    }
   }
 
   const handleSelectFiles = () => {
-    if (!disabled) inputRef.current?.click()
+    if (!disabled)
+      inputRef.current?.click()
+  }
+
+  const resetDrag = () => {
+    dragDepthRef.current = 0
+    setDragActive(false)
+  }
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    if (!droppable || disabled)
+      return
+
+    e.preventDefault()
+    e.stopPropagation()
+    dragDepthRef.current += 1
+    if (e.dataTransfer.types.includes('Files'))
+      setDragActive(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    if (!droppable || disabled)
+      return
+
+    e.preventDefault()
+    e.stopPropagation()
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1)
+    if (dragDepthRef.current === 0)
+      setDragActive(false)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    if (!droppable || disabled)
+      return
+
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = 'copy'
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    if (!droppable || disabled)
+      return
+
+    e.preventDefault()
+    e.stopPropagation()
+    resetDrag()
+
+    const dropped = Array.from(e.dataTransfer.files ?? [])
+    if (dropped.length === 0)
+      return
+
+    applyFiles(multiple ? dropped : dropped.slice(0, 1))
   }
 
   return (
-    <div className={`grid grid-cols-4 gap-2 ${colSpanClass(colspan)}`}>
-      {/* File input (hidden) */}
+    <div
+      className={[
+        'grid grid-cols-4 gap-2 rounded border border-dashed p-2 transition-colors',
+        colSpanClass(colspan),
+        dragActive
+          ? 'border-sky-500 bg-sky-50'
+          : droppable && !disabled
+            ? 'border-gray-300'
+            : 'border-transparent',
+      ].filter(Boolean).join(' ')}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       <input
         ref={inputRef}
         type={'file'}
         multiple={multiple}
+        accept={accept}
         style={{ display: 'none' }}
         onChange={handleFileChange}
         disabled={disabled}
       />
 
-      {/* Files counter with hover popup */}
       <div
         className={'col-span-1 flex items-center justify-center relative'}
         onMouseEnter={e => {
           setShowPopup(true)
-          if (!showPopup) {
+          if (!showPopup)
             setPopupPos({ x: e.clientX, y: e.clientY })
-          }
         }}
         onMouseLeave={e => {
-          // Only close if not moving into popup
-          if (!popupRef.current || !popupRef.current.contains(e.relatedTarget as Node)) {
+          if (!popupRef.current || !popupRef.current.contains(e.relatedTarget as Node))
             setShowPopup(false)
-          }
         }}
       >
         <span
@@ -129,20 +196,18 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
               outline: 'none',
             }}
             onBlur={e => {
-              // Only close if focus moves outside popup and counter
-              if (!e.relatedTarget || (!popupRef.current?.contains(e.relatedTarget as Node) && !(e.relatedTarget as HTMLElement)?.closest('.col-span-1'))) {
+              if (!e.relatedTarget || (!popupRef.current?.contains(e.relatedTarget as Node) && !(e.relatedTarget as HTMLElement)?.closest('.col-span-1')))
                 setShowPopup(false)
-              }
             }}
             onMouseLeave={e => {
-              // Only close if not moving back to counter
               const parent = (e.relatedTarget as HTMLElement)?.closest('.col-span-1')
-              if (!parent) setShowPopup(false)
+              if (!parent)
+                setShowPopup(false)
             }}
             onKeyDown={e => {
-              if (e.key === 'Escape') setShowPopup(false)
+              if (e.key === 'Escape')
+                setShowPopup(false)
             }}
-            onFocus={() => {}}
           >
             <ul className={'max-h-40 overflow-auto'} tabIndex={0} style={{outline: 'none'}}>
               {displayFiles.map((file, idx) => (
@@ -153,11 +218,8 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
             </ul>
           </div>
         )}
-
-
       </div>
 
-      {/* Clear selection button */}
       <ButtonComponent
         buttonHierarchy={'secondary'}
         onClick={handleClear}
@@ -167,17 +229,20 @@ const FileUploadComponent: React.FC<FileUploadComponentProps> = ({
         <Trash2 />
       </ButtonComponent>
 
-      {/* Select files button */}
       <ButtonComponent
-        colspan={2}        
-        children={label}
+        colspan={2}
         buttonHierarchy={'primary'}
         onClick={handleSelectFiles}
         disabled={disabled}
-      />
-
+      >
+        <span className={'inline-flex items-center gap-2'}>
+          <Upload className={'h-4 w-4'} />
+          {dragActive ? 'Drop files' : label}
+        </span>
+      </ButtonComponent>
     </div>
   )
 }
 
 export { FileUploadComponent }
+export type { FileUploadComponentProps }

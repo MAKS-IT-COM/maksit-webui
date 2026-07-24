@@ -33,6 +33,7 @@
     "components",
     "index.ts",
     "test/**/*.ts",
+    "test/**/*.tsx",
     "test/**/*.d.ts"
   ]
 }

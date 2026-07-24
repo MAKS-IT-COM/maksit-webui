@@ -16,8 +16,8 @@ Peer dependencies must be installed in the host app.
 | Area | Examples |
 |------|----------|
 | Contracts | `PagedRequest`, `PatchOperation`, `LoginRequestSchema`, OAuth DTOs |
-| Core | `deepDelta`, `useFormState`, `createWebUiHttpClient`, `useWebUiHub`, ACL parsers |
-| Components | `DataTable`, `Layout`, editors, `ExternalLoginButtons`, `IdpLoginCallbackHandler` |
+| Core | `deepDelta`, `useFormState`, `useLocalStorage`, `useSessionStorage`, `useOnScreen`, `useInterval`, `usePrevious`, `useLongPress`, `useDebounce`, `useOnClickOutside`, `useMedia`, `useHover`, `createWebUiHttpClient`, `useWebUiHub`, ACL parsers |
+| Components | `DataTable`, `FileBrowser` (create/upload/download hooks), `Modal`, `Loader`, `Masonry`, `LightBox`, `CookieConsent`, `Ratings`, social chat buttons, `Layout`, editors, OAuth UI |
 
 ## Example — imports
 
@@ -43,6 +43,26 @@ const delta = deepDelta(formState, backupState, {
 if (deltaHasOperations(delta)) {
   await api.patch('/resource', delta)
 }
+```
+
+**Request DTOs** that extend `RequestModelBase` (or `PatchRequestModelBase` for PATCH) must use the matching base Zod schema — `RequestModelBaseSchema` or `PatchRequestModelBaseSchema` — not a plain `z.object({...})`. Otherwise `safeParse` strips unknown keys (including PATCH `operations`). Response DTOs only need the `ResponseModelBase` TypeScript marker; there is no response base schema.
+
+```ts
+import { RequestModelBaseSchema, PatchRequestModelBaseSchema } from '@maks-it.com/webui'
+
+export const CreateEntityRequestSchema = RequestModelBaseSchema.and(
+  z.object({ name: z.string().min(1) }),
+)
+
+export const PatchEntityScopeRequestSchema = PatchRequestModelBaseSchema.and(
+  z.object({
+    id: z.string().optional(),
+    _deltaId: z.string().optional(),
+    entityId: z.string().optional(),
+    entityType: z.number().optional(),
+    scope: z.number().optional(),
+  }),
+)
 ```
 
 ## Repository

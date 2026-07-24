@@ -34,6 +34,7 @@ export {
 }
 
 export type { SecretDataSource, SecretComponentProps } from './SecretComponent'
+export type { FileUploadComponentProps } from './FileUploadComponent'
 export type {
   RemoteSelectBoxProps,
   RemoteSelectSearchDataSource,

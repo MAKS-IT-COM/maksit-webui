@@ -1,6 +1,8 @@
 # MaksIT.WebUI
 
-![Line Coverage](/assets/badges/coverage-lines.svg) ![Branch Coverage](/assets/badges/coverage-branches.svg) ![Method Coverage](/assets/badges/coverage-methods.svg)
+![Line Coverage](https://img.shields.io/badge/Line%20Coverage-83.8%25-brightgreen)
+![Branch Coverage](https://img.shields.io/badge/Branch%20Coverage-72.5%25-green)
+![Method Coverage](https://img.shields.io/badge/Method%20Coverage-72.8%25-green)
 
 Shared React UI library for **maksit-certs-ui** and **maksit-vault** WebUI apps.
 
@@ -24,7 +26,7 @@ npm run storybook
 
 **Storybook** (`npm run storybook`) runs a local component catalog with Tailwind, React Router, autodocs, a11y checks, and **Vitest component tests** (testing widget + `npm run test-storybook`). Stories live under `src/stories/components/`; see `src/stories/README.md`.
 
-Tests and coverage badges: **`utils\Invoke-TestEngine.bat`** (plugin config in `utils\engines\test\scriptSettings.json`; uses `NpmJestTest`).
+Tests and coverage badges (shields.io URLs in this README): **`utils\Invoke-TestEngine.bat`** (plugin config in `utils\engines\test\scriptSettings.json`; uses `NpmJestTest` + `CoverageBadges` with `badgeFormat: shields`).
 
 ## Release to npmjs
 

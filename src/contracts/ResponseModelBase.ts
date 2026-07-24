@@ -1,3 +1,3 @@
 export interface ResponseModelBase {
-    [key: string]: unknown
+  [key: string]: unknown
 }

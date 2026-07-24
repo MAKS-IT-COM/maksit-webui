@@ -24,7 +24,7 @@ components/components/     stories/components/
 └── LazyLoadTable.tsx                   └── LazyLoadTable.stories.tsx
 ```
 
-Use the **same folder names** as in the package (`Toast`, not `feedback`; `list`, not `List`). Storybook sidebar titles use the same path: `components/editors/Button`, `components/Toast`, etc.
+Use the **same folder names** as in the package (`Toast`, not `feedback`; `list`, not `List`). Storybook sidebar titles use the same path: `components/editors/Button`, `components/Toast`, etc. Core hook demos live under `stories/core/` (`core/hooks`).
 
 ## Imports
 

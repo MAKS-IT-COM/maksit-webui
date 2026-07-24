@@ -30,11 +30,17 @@ function New-EngineContext {
         $badgesDir = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir ([string]$Settings.paths.badgesDir)))
     }
 
+    $readmePath = $null
+    if ($Settings -and $Settings.PSObject.Properties['paths'] -and $Settings.paths.readmePath) {
+        $readmePath = [System.IO.Path]::GetFullPath((Join-Path $ScriptDir ([string]$Settings.paths.readmePath)))
+    }
+
     return [pscustomobject]@{
         scriptDir = $ScriptDir
         srcDir = $SrcDir
         utilsDir = $SrcDir
         badgesDir = $badgesDir
+        readmePath = $readmePath
         deployMode = $DeployMode
     }
 }

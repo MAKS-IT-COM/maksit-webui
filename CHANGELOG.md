@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.1] - 2026-07-24
+
+### Added
+
+- `FileBrowser` — full-featured **generic** storage browser (roots sidebar, breadcrumbs, sort/filter, multi-select delete, optional create folder / upload / download hooks, text/JSON preview). No product-specific OCI/catalog logic. Export: `FileBrowser`, `FileBrowserItem`, `FileBrowserProps`, `FileBrowserRoot`.
+- `Modal` / `ConfirmDialog` — centered dialog shell (Escape + backdrop close, title/body/footer) and confirm variant with primary/cancel actions.
+- `Loader` / `Spinner` — full-screen overlay loader with optional controlled `visible`, plus event helpers `showLoader` / `hideLoader` / `enableLoader` / `disableLoader` (ref-counted, matching host HTTP auth wiring). Inline `Spinner` for local loading UI.
+- `Masonry` — responsive column masonry layout (`breakpoints`).
+- `LightBox` — masonry gallery + fullscreen viewer (Escape / arrow keys, captions, thumbnails).
+- `CookieConsent` — consent bar with injectable `linkComponent` (no hard-coded react-router), plus `getCookie` / `setCookie` helpers.
+- `WhatsAppButton` / `FacebookMessengerButton` — click-to-chat links (`wa.me` / `m.me`); optional floating corner placement. Intentionally not the deprecated Facebook Customer Chat SDK.
+- `Ratings` — star rating widget (fractional fill, optional interactive `onChange`, sizes).
+- Core hooks: `usePrevious`, `useInterval`, `useOnScreen`, `useLocalStorage`, `useSessionStorage`, `useLongPress`, `useDebounce`, `useOnClickOutside`, `useMedia`, `useHover` (typed, SSR-safe where relevant; storage hooks sync via `storage` events).
+- Jest coverage for new hooks and component helpers (`FileBrowser` format/prefs, cookie helpers, loader events, social href builders); Storybook interaction plays for new components and a `core/hooks` demo.
+
+### Changed
+
+- `FileUploadComponent` — drag-and-drop (`droppable`, default true), `accept` filter, drop-active highlight; drop replaces the current selection.
+- Dev dependencies refreshed within current majors (Storybook 10.5, React 19.2.8, Vitest 4.1.10, axios 1.18, lucide-react 1.26, etc.). Held majors: SignalR 8, TypeScript 6, Vite 6.
+- Coverage badges: `CoverageBadges` uses `badgeFormat: shields` (updates `README.md` img.shields.io URLs) instead of writing SVG files under `assets/badges/`.
+
+### Removed
+
+- `ResponseModelBaseSchema` — empty Zod marker; keep the `ResponseModelBase` TypeScript type only (matches Core).
+- `assets/badges/` — local SVG coverage badges (replaced by shields.io).
+
+### Fixed
+
+- `LightBox`: fullscreen viewer footer uses a fixed-height horizontal filmstrip instead of a second Masonry grid (which crushed the main image).
+- `DataTable`: resync column widths when `columns.length` changes; `columnWidth` falls back to default so react-virtualized never receives `undefined`.
+
 ## [0.4.0] - 2026-07-07
 
 ### Changed
@@ -14,7 +45,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Release pipeline (`utils/engines/release/scriptSettings.json`) publishes one package; `NpmReleaseVersion.syncWorkspaceVersions` disabled.
 - Jest, Vitest, and Storybook configs updated for the flat `src/` layout (`@webui/*` aliases point at `src/{contracts,core,components}`).
 - VS Code/Cursor: TypeScript SDK and integrated terminal default to `src/`.
-- `src/coverage/` explicitly gitignored; generated coverage is no longer tracked (README badges remain under `assets/badges/`).
+- `src/coverage/` explicitly gitignored; generated coverage is no longer tracked.
 
 ### Removed
 

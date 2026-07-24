@@ -191,7 +191,7 @@ function Invoke-ContainerImagePush {
 
                 $primaryRef = "${baseName}:$($imageTags[0])"
                 Write-Log -Level 'STEP' -Message "Building $primaryRef via $engineName ..."
-                Invoke-ContainerEngine -Engine $engine build -t $primaryRef -f $dockerfilePath $imgContextPath
+                Invoke-ContainerEngine -Engine $engine build --provenance=false --sbom=false -t $primaryRef -f $dockerfilePath $imgContextPath
                 if ($LASTEXITCODE -ne 0) {
                     throw "Container build failed for $primaryRef (exit code: $LASTEXITCODE)"
                 }
