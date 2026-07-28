@@ -95,6 +95,7 @@ function Invoke-Plugin {
     Import-PluginDependency -ModuleName "Logging" -RequiredCommand "Write-Log"
     Import-PluginDependency -ModuleName "ScriptConfig" -RequiredCommand "Assert-Command"
     Import-PluginDependency -ModuleName "ChangelogSupport" -RequiredCommand "Get-LatestChangelogVersion"
+    Import-PluginDependency -ModuleName "EngineContext" -RequiredCommand "Get-EngineFact"
 
     $pluginSettings = $Settings
     $sharedSettings = $Settings.context
@@ -148,7 +149,26 @@ function Invoke-Plugin {
     $releaseNotesFile = [System.IO.Path]::GetFullPath((Join-Path $scriptDir $releaseNotesFileSetting))
     $releaseNotes = Get-ReleaseNotesInternal -ReleaseNotesFile $releaseNotesFile -Version $version
 
-    if ($sharedSettings.PSObject.Properties['releaseAssetPaths'] -and $sharedSettings.releaseAssetPaths) {
+    if (Get-Command Get-EngineFact -ErrorAction SilentlyContinue) {
+        $fromAssets = Get-EngineFact -Context $sharedSettings -Namespace 'release' -Name 'assetPaths' -LegacyProperty @('releaseAssetPaths')
+        if ($null -ne $fromAssets) {
+            $releaseAssetPaths = @($fromAssets)
+        }
+        else {
+            $packageFile = Get-EngineFact -Context $sharedSettings -Namespace 'dotnet' -Name 'packageFile' -LegacyProperty @('packageFile')
+            if ($null -eq $packageFile) {
+                $packageFile = Get-EngineFact -Context $sharedSettings -Namespace 'npm' -Name 'packageFile' -LegacyProperty @('packageFile')
+            }
+            if ($null -ne $packageFile) {
+                $releaseAssetPaths = @($packageFile.FullName)
+                $symbolsPackageFile = Get-EngineFact -Context $sharedSettings -Namespace 'dotnet' -Name 'symbolsPackageFile' -LegacyProperty @('symbolsPackageFile')
+                if ($null -ne $symbolsPackageFile) {
+                    $releaseAssetPaths += $symbolsPackageFile.FullName
+                }
+            }
+        }
+    }
+    elseif ($sharedSettings.PSObject.Properties['releaseAssetPaths'] -and $sharedSettings.releaseAssetPaths) {
         $releaseAssetPaths = @($sharedSettings.releaseAssetPaths)
     }
     elseif ($sharedSettings.PSObject.Properties['packageFile'] -and $sharedSettings.packageFile) {
@@ -231,6 +251,9 @@ function Invoke-Plugin {
         $notesFilePath = Join-Path $releaseDir ("release-notes-{0}.md" -f $version)
 
         try {
+            if (-not [string]::IsNullOrWhiteSpace($releaseDir) -and -not (Test-Path -LiteralPath $releaseDir -PathType Container)) {
+                New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
+            }
             [System.IO.File]::WriteAllText($notesFilePath, $releaseNotes, [System.Text.UTF8Encoding]::new($false))
 
             $createReleaseArgs = @("release", "create", $tag) + $releaseAssetPaths + @(
@@ -251,7 +274,7 @@ function Invoke-Plugin {
         }
 
         Write-Log -Level "OK" -Message "  GitHub release created successfully."
-        $sharedSettings | Add-Member -NotePropertyName publishCompleted -NotePropertyValue $true -Force
+        Add-EnginePublishCompletion -Context $sharedSettings -Publisher 'GitHub'
     }
     finally {
         if ($null -ne $previousGhToken) {

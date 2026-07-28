@@ -273,3 +273,7 @@ storybook-static/
 *.tsbuildinfo
 .DS_Store
 npm-debug.log*
+
+# Generated test reports (RepoUtils)
+test-results/
+utils/tests/results/

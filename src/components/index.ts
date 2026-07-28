@@ -56,7 +56,7 @@ export type {
   RemoteSelectBoxProps,
   RemoteSelectSearchDataSource,
 } from './components/editors/RemoteSelectBoxComponent'
-export { addToast } from './components/Toast/addToast'
+export { addToast, clearToasts } from './components/Toast/addToast'
 export { Toast as ToastContainer } from './components/Toast'
 export { EntityScopesSummary } from './components/Scopes'
 export type { EntityScopesSummaryProps } from './components/Scopes'

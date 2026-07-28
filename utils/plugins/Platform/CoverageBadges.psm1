@@ -9,7 +9,8 @@
     Reads line/branch/method coverage from shared engine context.
 
     badgeFormat "svg" (default): writes SVG files under badgesDir.
-    badgeFormat "shields": updates readmePath with img.shields.io markdown (no local assets).
+    badgeFormat "shields": updates readmePath (string or array) with img.shields.io markdown
+    (no local assets).
 #>
 
 if (-not (Get-Command Import-PluginDependency -ErrorAction SilentlyContinue)) {
@@ -145,7 +146,8 @@ function Update-ReadmeShieldsBadgesInternal {
 
         $color = Get-BadgeColorInternal -percentage $metricValue -thresholds $Thresholds
         $markdown = New-ShieldsIoBadgeMarkdownInternal -Label $badge.label -Percentage $metricValue -Color $color
-        $pattern = "(?m)^!\[$([regex]::Escape([string]$badge.label))\]\([^)]*\)\s*$"
+        # Horizontal whitespace only; optional CR for CRLF. Do not let \s* eat the following blank line.
+        $pattern = "(?m)^!\[$([regex]::Escape([string]$badge.label))\]\([^)]*\)[^\S\r\n]*\r?$"
         if ($content -notmatch $pattern) {
             throw "README badge line not found for label '$($badge.label)' in: $ReadmePath"
         }
@@ -227,19 +229,26 @@ function Invoke-Plugin {
     Write-Log -Level "STEP" -Message "Generating coverage badges..."
 
     if ($badgeFormat -eq 'shields') {
-        $readmePath = $null
+        $readmePathSetting = $null
         if ($sharedSettings.PSObject.Properties.Name -contains 'readmePath' -and $sharedSettings.readmePath) {
-            $readmePath = [string]$sharedSettings.readmePath
+            $readmePathSetting = $sharedSettings.readmePath
         }
-        if ($pluginSettings.readmePath) {
-            $readmePaths = @(Resolve-RelativePaths -Value $pluginSettings.readmePath -BasePath $scriptDir)
-            $readmePath = $readmePaths[0]
+        if ($pluginSettings.PSObject.Properties.Name -contains 'readmePath' -and $pluginSettings.readmePath) {
+            $readmePathSetting = $pluginSettings.readmePath
         }
-        if ([string]::IsNullOrWhiteSpace([string]$readmePath)) {
+
+        $readmePaths = @()
+        if ($null -ne $readmePathSetting) {
+            $readmePaths = @(Resolve-RelativePaths -Value $readmePathSetting -BasePath $scriptDir)
+        }
+        if ($readmePaths.Count -eq 0) {
             throw "CoverageBadges badgeFormat 'shields' requires readmePath in plugin settings or paths.readmePath in scriptSettings.json."
         }
 
-        Update-ReadmeShieldsBadgesInternal -ReadmePath $readmePath -Badges @($pluginSettings.badges) -Metrics $metrics -Thresholds $thresholds
+        foreach ($readmePath in $readmePaths) {
+            Update-ReadmeShieldsBadgesInternal -ReadmePath $readmePath -Badges @($pluginSettings.badges) -Metrics $metrics -Thresholds $thresholds
+            Write-Log -Level "OK" -Message "README shields updated: $readmePath"
+        }
 
         foreach ($badge in @($pluginSettings.badges)) {
             $metricValue = $metrics[[string]$badge.metric]
@@ -247,7 +256,6 @@ function Invoke-Plugin {
             Write-Log -Level "OK" -Message "$($badge.label): $metricValue% ($color)"
         }
 
-        Write-Log -Level "OK" -Message "README shields updated: $readmePath"
         Write-Log -Level "STEP" -Message "Commit README.md to publish badge URLs."
         return
     }

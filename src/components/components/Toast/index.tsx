@@ -25,20 +25,27 @@ const Toast: FC = () => {
         return [...prev, { id, message, type, duration }]
       })
 
-      // Auto-remove if a duration is specified
-      if (duration) {
+      // Auto-remove (default keeps error toasts from sticking forever)
+      const dismissAfter = duration ?? 8000
+      if (dismissAfter > 0) {
         setTimeout(() => {
           setToasts((prev) => prev.filter((toast) => toast.id !== id))
-        }, duration)
+        }, dismissAfter)
       }
+    }
+
+    const handleClearToasts = () => {
+      setToasts([])
     }
 
     // Listen for the custom event
     window.addEventListener('add-toast', handleAddToast as EventListener)
+    window.addEventListener('clear-toasts', handleClearToasts)
 
     return () => {
       // Cleanup event listener on component unmount
       window.removeEventListener('add-toast', handleAddToast as EventListener)
+      window.removeEventListener('clear-toasts', handleClearToasts)
     }
   }, [])
 

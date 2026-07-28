@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-07-28
+
+### Added
+
+- `clearToasts` — dismisses all active toasts (exported from `@maks-it.com/webui`; useful after recovery from transient auth/network errors).
+
+### Changed
+
+- Toast auto-dismiss: when `duration` is omitted, toasts now dismiss after **8s** by default (`duration > 0` still required to auto-dismiss; pass `0` to keep sticky).
+- RepoUtils refreshed to the Community-only layout: single `utils\Invoke-ReleasePackage.bat` entry point; removed HA/Single release wrappers, Helm uninstall engine, and Docker/Podman/Helm deploy plugins not used by this library repo.
+- `.gitignore`: ignore generated `test-results/` and `utils/tests/results/`.
+
 ## [0.4.1] - 2026-07-24
 
 ### Added

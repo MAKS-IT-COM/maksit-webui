@@ -32,7 +32,7 @@ Tests and coverage badges (shields.io URLs in this README): **`utils\Invoke-Test
 
 1. Set **`Npm`** environment variable to your npm automation token (logical secret name in `scriptSettings.json`).
 2. Bump **`src/package.json`** `version` (and tag `vX.Y.Z` on `main` when using the publish guard).
-3. Run **`utils\Invoke-ReleasePackage-Single.bat`** (or `pwsh utils\engines\release\Invoke-ReleasePackage.ps1`).
+3. Run **`utils\Invoke-ReleasePackage.bat`** (or `pwsh utils\engines\release\Invoke-ReleasePackage.ps1`).
 
 Configured plugins (see `utils\engines\release\scriptSettings.json`):
 

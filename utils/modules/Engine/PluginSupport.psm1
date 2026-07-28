@@ -16,6 +16,36 @@ if (-not (Get-Command Write-Log -ErrorAction SilentlyContinue)) {
     }
 }
 
+function Test-IsEngineRuntimeModuleName {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ModuleName
+    )
+
+    # Engine runtime under modules/ only — never dual-homed under plugins/.
+    $engineNames = [System.Collections.Generic.HashSet[string]]::new(
+        [string[]]@(
+            'ChangelogSupport',
+            'ExternalCommandSupport',
+            'GitTools',
+            'Logging',
+            'ScriptConfig',
+            'TestRunner',
+            'EngineContext',
+            'PluginSupport',
+            'ReleaseSupport',
+            'TestSupport',
+            'DeployConfig',
+            'EngineContextSupport',
+            'OrchestratorSupport',
+            'PluginPathSupport'
+        ),
+        [System.StringComparer]::OrdinalIgnoreCase
+    )
+
+    return $engineNames.Contains($ModuleName)
+}
+
 function Import-PluginDependency {
     param(
         [Parameter(Mandatory = $true)]
@@ -31,13 +61,29 @@ function Import-PluginDependency {
 
     $modulesDir = Get-RepoUtilsModulesDirectory
     $engineModuleDir = $PSScriptRoot
-    $modulePath = Join-Path $modulesDir "$ModuleName.psm1"
-    if (-not (Test-Path $modulePath -PathType Leaf)) {
-        $modulePath = Join-Path $engineModuleDir "$ModuleName.psm1"
+    $srcDir = Get-RepoUtilsSrcDirectory
+    $pluginsRoot = Join-Path $srcDir 'plugins'
+    $candidatePaths = [System.Collections.Generic.List[string]]::new()
+
+    if (Test-IsEngineRuntimeModuleName -ModuleName $ModuleName) {
+        # Engine runtime: modules/ only (no plugins/ fallback).
+        $candidatePaths.Add((Join-Path $modulesDir "$ModuleName.psm1"))
+        $candidatePaths.Add((Join-Path $engineModuleDir "$ModuleName.psm1"))
+        $extensionsDir = Join-Path $modulesDir 'Extensions'
+        $candidatePaths.Add((Join-Path $extensionsDir "$ModuleName.psm1"))
+    }
+    else {
+        # Plugin helpers: plugins/ only (no modules/ legacy shadow).
+        foreach ($group in @('Shared', 'Platform', 'DotNet', 'Npm', 'Helm', 'Docker', 'Podman')) {
+            $candidatePaths.Add((Join-Path (Join-Path $pluginsRoot $group) "$ModuleName.psm1"))
+        }
     }
 
-    if (Test-Path $modulePath -PathType Leaf) {
-        Import-Module $modulePath -Force -Global -ErrorAction Stop
+    foreach ($modulePath in $candidatePaths) {
+        if (Test-Path -LiteralPath $modulePath -PathType Leaf) {
+            Import-Module $modulePath -Force -Global -ErrorAction Stop
+            break
+        }
     }
 
     if (-not (Get-Command $RequiredCommand -ErrorAction SilentlyContinue)) {
@@ -117,24 +163,6 @@ function Test-PluginAllowedOnBranch {
     return $allowedBranches -contains $CurrentBranch
 }
 
-function Get-MaksitOrchestrator {
-    <#
-    .SYNOPSIS
-        Returns Compose/Kubernetes when MAKSIT_ORCHESTRATOR is set; otherwise $null (local dev — all plugins run).
-    #>
-    $raw = [Environment]::GetEnvironmentVariable('MAKSIT_ORCHESTRATOR')
-    if ([string]::IsNullOrWhiteSpace($raw)) {
-        return $null
-    }
-
-    switch ($raw.Trim().ToLowerInvariant()) {
-        'compose' { return 'Compose' }
-        'kubernetes' { return 'Kubernetes' }
-        'k8s' { return 'Kubernetes' }
-        default { return $raw.Trim() }
-    }
-}
-
 function Get-PluginMetadataObject {
     param(
         [Parameter(Mandatory = $true)]
@@ -163,11 +191,10 @@ function Get-PluginMetadataObject {
     }
 }
 
-function Test-PluginSupportsOrchestrator {
+function Test-PluginCompatible {
     <#
     .SYNOPSIS
-        When MAKSIT_ORCHESTRATOR is unset (local dev), returns $true for every plugin.
-        When set (CI/ContainerBuilder), skips plugins whose orchestrators list excludes the active profile.
+        Applies an optional compatibility policy supplied by an extension.
     #>
     param(
         [Parameter(Mandatory = $true)]
@@ -180,35 +207,12 @@ function Test-PluginSupportsOrchestrator {
         [bool]$WriteLogs = $true
     )
 
-    $orchestrator = Get-MaksitOrchestrator
-    if ([string]::IsNullOrWhiteSpace($orchestrator)) {
-        return $true
+    $extensionTest = Get-Command Test-ExtensionPluginCompatibility -ErrorAction SilentlyContinue
+    if ($extensionTest) {
+        return & $extensionTest @PSBoundParameters
     }
 
-    $allowed = @()
-    if ($Plugin.PSObject.Properties.Name -contains 'orchestrators' -and $Plugin.orchestrators) {
-        $allowed = @($Plugin.orchestrators | ForEach-Object { ([string]$_).Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-    }
-    else {
-        $metadata = Get-PluginMetadataObject -Plugin $Plugin -EngineDirectory $EngineDirectory
-        if ($null -ne $metadata -and $metadata.PSObject.Properties.Name -contains 'orchestrators' -and $metadata.orchestrators) {
-            $allowed = @($metadata.orchestrators | ForEach-Object { ([string]$_).Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-        }
-    }
-
-    if ($allowed.Count -eq 0) {
-        return $true
-    }
-
-    if ($orchestrator -in $allowed) {
-        return $true
-    }
-
-    if ($WriteLogs) {
-        Write-Log -Level 'INFO' -Message "Skipping plugin '$($Plugin.name)' (requires orchestrator in: $($allowed -join ', '); active: $orchestrator)."
-    }
-
-    return $false
+    return $true
 }
 
 function Test-PluginMutatesRemote {
@@ -266,6 +270,24 @@ function Test-PluginMutatesRemote {
 }
 
 function Get-SecretEnvironmentValue {
+    <#
+    .SYNOPSIS
+        Reads a secret value from an environment variable by logical name.
+
+    .DESCRIPTION
+        Plugins never store secret material in scriptSettings.json. Settings hold a
+        logical name (e.g. "GitHub", "NuGet"); the process environment variable with
+        that same name must be set before the engine runs.
+
+    .PARAMETER Name
+        Logical secret name — also the environment variable name to read.
+
+    .OUTPUTS
+        System.String. The environment variable value, or $null when unset.
+
+    .EXAMPLE
+        $token = Get-SecretEnvironmentValue -Name 'GitHub'
+    #>
     param(
         [Parameter(Mandatory = $true)]
         [string]$Name
@@ -275,6 +297,28 @@ function Get-SecretEnvironmentValue {
 }
 
 function Resolve-PluginSecretName {
+    <#
+    .SYNOPSIS
+        Resolves a logical secret name from a plugin's scriptSettings entry.
+
+    .DESCRIPTION
+        Reads a string property such as githubSecret / nugetSecret / npmSecret /
+        containerRegistrySecret from the plugin settings object. Returns $null when
+        the property is missing or blank.
+
+    .PARAMETER PluginSettings
+        Plugin settings object from scriptSettings.json (the enabled plugin entry).
+
+    .PARAMETER PropertyName
+        Settings property that holds the logical secret name (e.g. 'githubSecret').
+
+    .OUTPUTS
+        System.String. Trimmed logical secret name, or $null.
+
+    .EXAMPLE
+        $name = Resolve-PluginSecretName -PluginSettings $plugin -PropertyName 'nugetSecret'
+        $key  = Get-SecretEnvironmentValue -Name $name
+    #>
     param(
         [Parameter(Mandatory = $true)]
         $PluginSettings,
@@ -294,6 +338,34 @@ function Resolve-PluginSecretName {
 }
 
 function Get-RegistryCredentialsFromRuntime {
+    <#
+    .SYNOPSIS
+        Loads container-registry username/password from a logical secret name.
+
+    .DESCRIPTION
+        Looks up the environment variable named by SecretName. The value must be
+        Base64(UTF8('username:password')). Used by Docker/Podman/Helm registry login
+        and image-pull secret creation — never pass the password itself as a parameter.
+
+    .PARAMETER SecretName
+        Logical secret name (environment variable name), not a password or token.
+
+    .PARAMETER SharedSettings
+        Optional engine shared context (reserved for callers that thread context).
+
+    .OUTPUTS
+        Hashtable with User and Password keys (decoded credential material).
+
+    .EXAMPLE
+        $creds = Get-RegistryCredentialsFromRuntime -SecretName 'ContainerRegistry'
+        # $creds.User / $creds.Password
+    #>
+    # SecretName is a logical env-var name from scriptSettings, not a password value.
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSAvoidUsingPlainTextForPassword',
+        'SecretName',
+        Justification = 'Logical secret name for env lookup (Base64 username:password); not a credential value.'
+    )]
     param(
         [Parameter(Mandatory = $true)]
         [string]$SecretName,
@@ -322,35 +394,17 @@ function Get-RegistryCredentialsFromRuntime {
     return @{ User = $parts[0]; Password = $parts[1] }
 }
 
-function Get-EngineDryRun {
-    param(
-        [Parameter(Mandatory = $false)]
-        [psobject]$Settings
-    )
-
-    $envVal = [Environment]::GetEnvironmentVariable('MAKSIT_REPOUTILS_DRY_RUN')
-    if (-not [string]::IsNullOrWhiteSpace($envVal)) {
-        return @('1', 'true', 'yes') -contains $envVal.Trim().ToLowerInvariant()
-    }
-
-    if ($Settings -and $Settings.PSObject.Properties['dryRun'] -and $null -ne $Settings.dryRun) {
-        return [bool]$Settings.dryRun
-    }
-
-    return $false
-}
-
-function Test-EngineDryRun {
+function Resolve-EngineDirectoryFromSharedSettings {
     param(
         [Parameter(Mandatory = $true)]
-        [psobject]$SharedSettings
+        $SharedSettings
     )
 
-    if ($SharedSettings.PSObject.Properties.Name -contains 'dryRun') {
-        return [bool]$SharedSettings.dryRun
+    if ($SharedSettings.PSObject.Properties.Name -contains 'engineScriptDir' -and -not [string]::IsNullOrWhiteSpace([string]$SharedSettings.engineScriptDir)) {
+        return [string]$SharedSettings.engineScriptDir
     }
 
-    return $false
+    return [string]$SharedSettings.scriptDir
 }
 
 function Test-PluginSkipsRemoteMutation {
@@ -362,8 +416,12 @@ function Test-PluginSkipsRemoteMutation {
         [psobject]$SharedSettings
     )
 
-    $engineDirectory = [string]$SharedSettings.scriptDir
-    return (Test-EngineDryRun -SharedSettings $SharedSettings) -and (Test-PluginMutatesRemote -Plugin $Plugin -EngineDirectory $engineDirectory)
+    $engineDirectory = Resolve-EngineDirectoryFromSharedSettings -SharedSettings $SharedSettings
+    if (-not (Test-PluginMutatesRemote -Plugin $Plugin -EngineDirectory $engineDirectory)) {
+        return $false
+    }
+
+    return ($Plugin.PSObject.Properties.Name -contains 'dryRun' -and $null -ne $Plugin.dryRun -and [bool]$Plugin.dryRun)
 }
 
 function Test-IsPublishPlugin {
@@ -511,15 +569,31 @@ function Resolve-PluginModulePath {
     $srcDir = Split-Path (Split-Path $EngineDirectory -Parent) -Parent
     $pluginsRoot = Join-Path $srcDir "plugins"
     $pluginFileName = "{0}.psm1" -f $Plugin.name
-    $candidatePaths = @(
-        (Join-Path (Join-Path $EngineDirectory "custom") $pluginFileName),
-        (Join-Path (Join-Path $pluginsRoot "Platform") $pluginFileName),
-        (Join-Path (Join-Path $pluginsRoot "Docker") $pluginFileName),
-        (Join-Path (Join-Path $pluginsRoot "Podman") $pluginFileName),
-        (Join-Path (Join-Path $pluginsRoot "Helm") $pluginFileName),
-        (Join-Path (Join-Path $pluginsRoot "DotNet") $pluginFileName),
-        (Join-Path (Join-Path $pluginsRoot "Npm") $pluginFileName)
-    )
+    $candidatePaths = [System.Collections.Generic.List[string]]::new()
+    $candidatePaths.Add((Join-Path (Join-Path $EngineDirectory "custom") $pluginFileName))
+
+    $preferredGroups = @('Platform', 'DotNet', 'Npm')
+    $candidatePaths.Add((Join-Path (Join-Path $pluginsRoot $preferredGroups[0]) $pluginFileName))
+
+    if (Get-Command Get-ExtensionPluginModulePaths -ErrorAction SilentlyContinue) {
+        foreach ($extensionPath in Get-ExtensionPluginModulePaths -PluginsRoot $pluginsRoot -PluginFileName $pluginFileName) {
+            $candidatePaths.Add($extensionPath)
+        }
+    }
+
+    foreach ($group in $preferredGroups[1..($preferredGroups.Count - 1)]) {
+        $candidatePaths.Add((Join-Path (Join-Path $pluginsRoot $group) $pluginFileName))
+    }
+
+    $reservedPluginDirs = @($preferredGroups + @('Shared'))
+    if (Test-Path -LiteralPath $pluginsRoot -PathType Container) {
+        Get-ChildItem -LiteralPath $pluginsRoot -Directory -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notin $reservedPluginDirs } |
+            Sort-Object Name |
+            ForEach-Object {
+                $candidatePaths.Add((Join-Path $_.FullName $pluginFileName))
+            }
+    }
 
     foreach ($candidatePath in $candidatePaths) {
         if (Test-Path $candidatePath -PathType Leaf) {
@@ -611,12 +685,31 @@ function Invoke-ConfiguredPlugin {
         return $true
     }
 
+    $metadata = Get-PluginMetadataObject -Plugin $Plugin -EngineDirectory $EngineDirectory
+    if ($null -ne $metadata -and ($metadata.PSObject.Properties.Name -contains 'providesVersion') -and [bool]$metadata.providesVersion) {
+        $versionAlreadySet = $false
+        if (Get-Command Get-EngineState -ErrorAction SilentlyContinue) {
+            $existingVersion = Get-EngineState -Context $SharedSettings -Name 'version' -ErrorAction SilentlyContinue
+            $versionAlreadySet = -not [string]::IsNullOrWhiteSpace([string]$existingVersion)
+        }
+        elseif (($SharedSettings.PSObject.Properties.Name -contains 'version') -and -not [string]::IsNullOrWhiteSpace([string]$SharedSettings.version)) {
+            $versionAlreadySet = $true
+        }
+
+        if ($versionAlreadySet) {
+            Write-Log -Level "INFO" -Message "Skipping plugin '$($Plugin.name)' (version already resolved during New-EngineContext)."
+            return $true
+        }
+
+        # Test engine (and other hosts) may not resolve version in New-EngineContext; run the plugin now.
+    }
+
     if ((Test-IsPublishPlugin -Plugin $Plugin) -and ($SharedSettings.PSObject.Properties.Name -contains 'skipPublishPlugins') -and $SharedSettings.skipPublishPlugins) {
         Write-Log -Level "INFO" -Message "Skipping plugin '$($Plugin.name)' (ReleasePublishGuard suppressed publish)."
         return $true
     }
 
-    if (-not (Test-PluginSupportsOrchestrator -Plugin $Plugin -EngineDirectory $EngineDirectory -WriteLogs:$true)) {
+    if (-not (Test-PluginCompatible -Plugin $Plugin -EngineDirectory $EngineDirectory -WriteLogs:$true)) {
         return $true
     }
 
@@ -638,4 +731,4 @@ function Invoke-ConfiguredPlugin {
     }
 }
 
-Export-ModuleMember -Function Import-PluginDependency, Get-ConfiguredPlugins, Get-PluginStageLabel, Get-PluginBranches, Get-MaksitOrchestrator, Get-PluginMetadataObject, Test-PluginSupportsOrchestrator, Test-PluginMutatesRemote, Resolve-PluginSecretName, Get-SecretEnvironmentValue, Get-RegistryCredentialsFromRuntime, Get-EngineDryRun, Test-EngineDryRun, Test-PluginSkipsRemoteMutation, Test-IsPublishPlugin, Get-PluginSettingValue, Get-PluginPathListSetting, Get-PluginPathSetting, Get-ArchiveNamePattern, Resolve-PluginModulePath, Test-PluginRunnable, New-PluginInvocationSettings, Invoke-ConfiguredPlugin
+Export-ModuleMember -Function Import-PluginDependency, Get-ConfiguredPlugins, Get-PluginStageLabel, Get-PluginBranches, Get-PluginMetadataObject, Test-PluginCompatible, Test-PluginMutatesRemote, Resolve-PluginSecretName, Get-SecretEnvironmentValue, Get-RegistryCredentialsFromRuntime, Test-PluginSkipsRemoteMutation, Test-IsPublishPlugin, Get-PluginSettingValue, Get-PluginPathListSetting, Get-PluginPathSetting, Get-ArchiveNamePattern, Resolve-PluginModulePath, Test-PluginRunnable, New-PluginInvocationSettings, Invoke-ConfiguredPlugin
