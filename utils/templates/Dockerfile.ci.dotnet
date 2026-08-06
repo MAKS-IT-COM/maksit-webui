@@ -1,0 +1,21 @@
+# CI builder image for .NET NuGet libraries: test (Coverlet) + pack in one ENTRYPOINT.
+#
+# Setup in a product repo:
+#   1. Copy to utils/engines/containerbuilder/{repo}-containerbuilder.Dockerfile
+#   2. Customize test/pack .csproj paths below
+#   3. Reference the same dockerfile from engines/test and engines/release scriptSettings
+#   4. Disable host DotNetTest and DotNetPack; enable CollectCoverage + DiscoverPackageArtifacts (release)
+#
+# Source injection: ContainerBuilder copies sourceContextPath into WORKDIR (/src).
+#   - Repo root (sourceContextPath ..\..\..): use paths like src/YourProject/YourProject.csproj
+#   - src folder (sourceContextPath ..\..\..\src): use paths like YourProject/YourProject.csproj
+#
+# Reference: maksit-nats (utils/engines/containerbuilder/maksit-nats-containerbuilder.Dockerfile)
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0
+WORKDIR /src
+ENV ARTIFACTS_DIR=/artifacts
+RUN mkdir -p /artifacts /testResults
+
+# Option B: COPY build/ci-dotnet-pack.sh /usr/local/bin/ci-pack.sh && chmod +x ... && ENTRYPOINT ["/usr/local/bin/ci-pack.sh"]
+ENTRYPOINT ["sh", "-c", "dotnet test path/to/YourProject.Tests/YourProject.Tests.csproj -c Release --nologo --collect:\"XPlat Code Coverage\" --results-directory /testResults && dotnet pack path/to/YourProject/YourProject.csproj -c Release -o /artifacts --nologo -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg"]

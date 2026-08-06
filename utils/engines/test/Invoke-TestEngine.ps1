@@ -6,6 +6,8 @@
     Plugin-driven test and coverage engine entry script.
 #>
 
+$ErrorActionPreference = 'Stop'
+
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $srcDir = (Resolve-Path (Join-Path $scriptDir '..\..')).Path
 
@@ -29,7 +31,7 @@ if ($configuredPlugins.Count -eq 0) {
 $testHadPluginFailures = $false
 
 foreach ($plugin in $configuredPlugins) {
-    $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $engineContext -EngineDirectory $scriptDir -ContinueOnError:$false
+    $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $engineContext -EngineDirectory $scriptDir
     if (-not $pluginSucceeded) {
         $testHadPluginFailures = $true
         break

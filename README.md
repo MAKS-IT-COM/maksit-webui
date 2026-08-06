@@ -44,7 +44,7 @@ Configured plugins (see `utils\engines\release\scriptSettings.json`):
 | `GitHub` | GitHub release (optional; set `GitHub` env var) |
 | `NpmPublish` | Publish `@maks-it.com/webui` |
 
-Refresh shared utils from repoutils: **`utils\Update-RepoUtils.bat`**.
+Refresh shared utils from **maksit-repoutils** via local-copy sync (no Update-RepoUtils in product repos).
 
 ## Consume in product repos
 

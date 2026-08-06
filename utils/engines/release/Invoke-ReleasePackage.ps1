@@ -80,7 +80,7 @@ else {
             }
         }
 
-        $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $sharedPluginSettings -EngineDirectory $PSScriptRoot -ContinueOnError:$false
+        $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $sharedPluginSettings -EngineDirectory $PSScriptRoot
         if (-not $pluginSucceeded) {
             $releaseHadPluginFailures = $true
             break
