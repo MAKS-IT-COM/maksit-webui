@@ -4,7 +4,11 @@ export { SecretComponent } from './components/editors/SecretComponent'
 export type { SecretDataSource, SecretComponentProps } from './components/editors/SecretComponent'
 export { FormContainer, FormContent, FormFooter, FormHeader } from './components/FormLayout'
 export { Breadcrumb } from './components/Breadcrumb'
-export type { BreadcrumbProps, BreadcrumbItem } from './components/Breadcrumb'
+export type {
+  BreadcrumbProps,
+  BreadcrumbItem,
+  BreadcrumbLinkComponent,
+} from './components/Breadcrumb'
 export { Offcanvas } from './components/Offcanvas'
 export { Modal, ConfirmDialog } from './components/Modal'
 export type { ModalProps, ModalSize, ConfirmDialogProps } from './components/Modal'
@@ -22,7 +26,11 @@ export type { MasonryProps } from './components/Masonry'
 export { LightBox } from './components/LightBox'
 export type { LightBoxProps, LightBoxSlide } from './components/LightBox'
 export { CookieConsent, getCookie, setCookie } from './components/CookieConsent'
-export type { CookieConsentProps, CookieConsentLink } from './components/CookieConsent'
+export type {
+  CookieConsentProps,
+  CookieConsentLink,
+  CookieConsentLinkComponent,
+} from './components/CookieConsent'
 export {
   WhatsAppButton,
   buildWhatsAppHref,

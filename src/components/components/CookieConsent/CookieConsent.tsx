@@ -17,12 +17,15 @@ export interface CookieConsentLink {
   linkProps?: Record<string, unknown>
 }
 
-type ConsentLinkComponent = ComponentType<{
+/**
+ * Injectable link surface for SPA routers.
+ * `to` is always provided when CookieConsent renders a link, so react-router `Link` is assignable.
+ */
+export type CookieConsentLinkComponent = ComponentType<{
+  to: string
   href?: string
-  to?: string
   className?: string
   children?: ReactNode
-  [key: string]: unknown
 }>
 
 export interface CookieConsentProps {
@@ -33,13 +36,13 @@ export interface CookieConsentProps {
   cookieName?: string
   cookieDays?: number
   /** Host injects `Link` from react-router (or any anchor-like component). Defaults to `<a>`. */
-  linkComponent?: ConsentLinkComponent
+  linkComponent?: CookieConsentLinkComponent
   onAccept?: () => void
   onDismiss?: () => void
   className?: string
 }
 
-const DefaultLink: ConsentLinkComponent = ({
+const DefaultLink: CookieConsentLinkComponent = ({
   href,
   to,
   children,
@@ -108,18 +111,24 @@ const CookieConsent: FC<CookieConsentProps> = ({
         {message}
         {links.length > 0 ? (
           <ul className={'mt-2 flex flex-wrap gap-x-3 gap-y-1'}>
-            {links.map((link, index) => (
-              <li key={index}>
-                <LinkComponent
-                  href={link.href ?? (typeof link.to === 'string' ? link.to : undefined)}
-                  to={link.to ?? link.href}
-                  className={'text-sky-700 underline hover:text-sky-900'}
-                  {...(link.linkProps ?? {})}
-                >
-                  {link.label}
-                </LinkComponent>
-              </li>
-            ))}
+            {links.map((link, index) => {
+              const target = link.to ?? link.href
+              if (!target)
+                return null
+
+              return (
+                <li key={index}>
+                  <LinkComponent
+                    href={link.href ?? (typeof link.to === 'string' ? link.to : undefined)}
+                    to={target}
+                    className={'text-sky-700 underline hover:text-sky-900'}
+                    {...(link.linkProps ?? {})}
+                  >
+                    {link.label}
+                  </LinkComponent>
+                </li>
+              )
+            })}
           </ul>
         ) : null}
       </div>

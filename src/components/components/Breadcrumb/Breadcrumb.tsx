@@ -14,12 +14,15 @@ export interface BreadcrumbItem {
   linkProps?: Record<string, unknown>
 }
 
-type BreadcrumbLinkComponent = ComponentType<{
+/**
+ * Injectable link surface for SPA routers.
+ * `to` is always provided when Breadcrumb renders a link, so react-router `Link` is assignable.
+ */
+export type BreadcrumbLinkComponent = ComponentType<{
+  to: string
   href?: string
-  to?: string
   className?: string
   children?: ReactNode
-  [key: string]: unknown
 }>
 
 export interface BreadcrumbProps {
@@ -89,10 +92,10 @@ const Breadcrumb: FC<BreadcrumbProps> = ({
                 </span>
               ) : null}
 
-              {isLink ? (
+              {isLink && target ? (
                 <LinkComponent
                   href={item.href ?? (typeof item.to === 'string' ? item.to : undefined)}
-                  to={item.to ?? item.href}
+                  to={target}
                   className={linkClassName}
                   {...(item.linkProps ?? {})}
                 >
