@@ -4,11 +4,7 @@ export { SecretComponent } from './components/editors/SecretComponent'
 export type { SecretDataSource, SecretComponentProps } from './components/editors/SecretComponent'
 export { FormContainer, FormContent, FormFooter, FormHeader } from './components/FormLayout'
 export { Breadcrumb } from './components/Breadcrumb'
-export type {
-  BreadcrumbProps,
-  BreadcrumbItem,
-  BreadcrumbLinkComponent,
-} from './components/Breadcrumb'
+export type { BreadcrumbProps, BreadcrumbItem } from './components/Breadcrumb'
 export { Offcanvas } from './components/Offcanvas'
 export { Modal, ConfirmDialog } from './components/Modal'
 export type { ModalProps, ModalSize, ConfirmDialogProps } from './components/Modal'

@@ -1,29 +1,11 @@
-import {
-  type ComponentType,
-  type FC,
-  type ReactNode,
-} from 'react'
+import { type FC, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 
 export interface BreadcrumbItem {
   label: ReactNode
-  /** Used by default `<a>` and as fallback for router links. */
-  href?: string
-  /** Preferred when injecting react-router `Link`. */
+  /** Omit on the current page (last item). */
   to?: string
-  /** Extra props passed to the injected link component. */
-  linkProps?: Record<string, unknown>
 }
-
-/**
- * Injectable link surface for SPA routers.
- * `to` is always provided when Breadcrumb renders a link, so react-router `Link` is assignable.
- */
-export type BreadcrumbLinkComponent = ComponentType<{
-  to: string
-  href?: string
-  className?: string
-  children?: ReactNode
-}>
 
 export interface BreadcrumbProps {
   items: BreadcrumbItem[]
@@ -33,35 +15,21 @@ export interface BreadcrumbProps {
   linkClassName?: string
   currentClassName?: string
   separatorClassName?: string
-  /** Host injects `Link` from react-router (or any anchor-like component). Defaults to `<a>`. */
-  linkComponent?: BreadcrumbLinkComponent
   /** Accessible name for the nav landmark. Defaults to `"Breadcrumb"`. */
   label?: string
 }
 
-const DefaultLink: BreadcrumbLinkComponent = ({
-  href,
-  to,
-  children,
-  ...rest
-}) => (
-  <a href={href ?? to} {...rest}>
-    {children}
-  </a>
-)
-
 /**
- * Presentational page trail. Use links/`span` only — never headings.
- * Keep a single page `h1` on `FormHeader` or the page title.
+ * Page trail (`nav` + `ol`). Links use react-router `Link`.
+ * Never uses headings — keep a single page `h1` on `FormHeader` or the page title.
  */
 const Breadcrumb: FC<BreadcrumbProps> = ({
   items,
   separator = '/',
   className = '',
-  linkClassName = 'text-sky-700 hover:text-sky-900 hover:underline',
-  currentClassName = 'text-gray-700',
-  separatorClassName = 'text-gray-400',
-  linkComponent: LinkComponent = DefaultLink,
+  linkClassName = 'text-slate-500 hover:text-slate-800 hover:underline',
+  currentClassName = 'text-slate-700',
+  separatorClassName = 'text-slate-400',
   label = 'Breadcrumb',
 }) => {
   if (items.length === 0)
@@ -75,8 +43,7 @@ const Breadcrumb: FC<BreadcrumbProps> = ({
       <ol className={'flex flex-wrap items-center gap-x-2 gap-y-1'}>
         {items.map((item, index) => {
           const isLast = index === items.length - 1
-          const target = item.to ?? item.href
-          const isLink = !isLast && Boolean(target)
+          const isLink = !isLast && Boolean(item.to)
 
           return (
             <li
@@ -92,15 +59,13 @@ const Breadcrumb: FC<BreadcrumbProps> = ({
                 </span>
               ) : null}
 
-              {isLink && target ? (
-                <LinkComponent
-                  href={item.href ?? (typeof item.to === 'string' ? item.to : undefined)}
-                  to={target}
+              {isLink && item.to ? (
+                <Link
+                  to={item.to}
                   className={linkClassName}
-                  {...(item.linkProps ?? {})}
                 >
                   {item.label}
-                </LinkComponent>
+                </Link>
               ) : (
                 <span
                   className={currentClassName}

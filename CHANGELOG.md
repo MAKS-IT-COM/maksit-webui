@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.5] - 2026-08-12
+
+### Changed
+
+- **Breaking:** `Breadcrumb` now renders links with react-router `Link` directly. Dropped injectable `linkComponent`, `href`, and `linkProps` — use `to` on trail items only. Default link/current/separator colors use slate tones.
+
+### Removed
+
+- `BreadcrumbLinkComponent` export (no longer needed).
+
 ## [0.4.4] - 2026-08-12
 
 ### Fixed

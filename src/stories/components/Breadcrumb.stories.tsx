@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Presentational page trail (`nav` + `ol`). Never uses headings — keep a single page `h1` on `FormHeader` or the page title. Inject `linkComponent` (e.g. react-router `Link`) for SPA navigation.',
+          'Page trail (`nav` + `ol`) using react-router `Link`. Never uses headings — keep a single page `h1` on `FormHeader` or the page title.',
       },
     },
   },
@@ -47,15 +47,14 @@ export const SingleItem: Story = {
 export const WithFormHeader: Story = {
   render: () => (
     <div className="space-y-0 border border-gray-200 bg-white">
-      <div className="bg-gray-50 px-4 py-2">
-        <Breadcrumb
-          items={[
-            { label: 'Admin', to: '/admin' },
-            { label: 'Shop', to: '/admin/shop' },
-            { label: 'Edit item' },
-          ]}
-        />
-      </div>
+      <Breadcrumb
+        className="bg-gray-50 px-4 py-2"
+        items={[
+          { label: 'Admin', to: '/admin' },
+          { label: 'Shop', to: '/admin/shop' },
+          { label: 'Edit item' },
+        ]}
+      />
       <FormHeader>Edit shop item</FormHeader>
       <div className="p-4 text-sm text-gray-600">Form content</div>
     </div>
