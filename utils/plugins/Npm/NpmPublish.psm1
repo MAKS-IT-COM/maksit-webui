@@ -6,9 +6,9 @@
     Publishes npm workspace packages to the npm registry.
 
 .DESCRIPTION
-    Publishes packages in configured order using npmSecret (logical secret name).
-    Pass the token via an environment variable named like the configured npm secret (e.g. Npm).
-    Uses a temporary .npmrc in the workspace root.
+    Stages packages in configured order using RepoUtilsSecrets slot Npm.
+    Uses npm stage publish so a maintainer approves the version with 2FA.
+    Requires npm CLI 11.15.0 or newer. Uses a temporary .npmrc in the workspace root.
 #>
 
 if (-not (Get-Command Import-PluginDependency -ErrorAction SilentlyContinue)) {
@@ -28,6 +28,7 @@ function Invoke-Plugin {
     Import-PluginDependency -ModuleName "Logging" -RequiredCommand "Write-Log"
     Import-PluginDependency -ModuleName "ScriptConfig" -RequiredCommand "Assert-Command"
     Import-PluginDependency -ModuleName "EngineContext" -RequiredCommand "Resolve-RelativePaths"
+    Import-PluginDependency -ModuleName "ChangelogSupport" -RequiredCommand "Get-ReleaseSemverPrereleaseLabel"
 
     $pluginSettings = $Settings
     $shared = $Settings.context
@@ -62,6 +63,14 @@ function Invoke-Plugin {
         [string]$pluginSettings.access
     }
 
+    $npmDistTag = $null
+    if (-not [string]::IsNullOrWhiteSpace([string]$pluginSettings.npmDistTag)) {
+        $npmDistTag = [string]$pluginSettings.npmDistTag
+    }
+    else {
+        $npmDistTag = Get-ReleaseSemverPrereleaseLabel -Version ([string]$shared.version)
+    }
+
     $publishOrder = @()
     if ($pluginSettings.publishOrder) {
         if ($pluginSettings.publishOrder -is [System.Collections.IEnumerable] -and -not ($pluginSettings.publishOrder -is [string])) {
@@ -76,6 +85,8 @@ function Invoke-Plugin {
         throw "NpmPublish plugin requires non-empty 'publishOrder' (workspace package names)."
     }
 
+    $npmSecret = Resolve-PluginSecretName -PluginSettings $pluginSettings -PropertyName 'npmSecret' -PluginDisplayName 'NpmPublish' -Required
+
     Import-Module (Join-Path $PSScriptRoot 'NpmPackageSupport.psm1') -Force
     $useWorkspaces = Test-NpmWorkspacesConfigured -WorkspaceRoot $workspaceRoot
     if (-not $useWorkspaces -and $publishOrder.Count -gt 1) {
@@ -84,19 +95,24 @@ function Invoke-Plugin {
 
     if ($dryRun) {
         foreach ($packageName in $publishOrder) {
-            Write-Log -Level "INFO" -Message "Dry run: would publish npm package '$packageName' to $registry"
+            $tagNote = if ([string]::IsNullOrWhiteSpace($npmDistTag)) { 'latest' } else { $npmDistTag }
+            Write-Log -Level "INFO" -Message "Dry run: would stage npm package '$packageName' to $registry (dist-tag $tagNote). Approval with 2FA is separate."
         }
         return
     }
 
-    $npmSecret = Resolve-PluginSecretName -PluginSettings $pluginSettings -PropertyName 'npmSecret'
-    if ([string]::IsNullOrWhiteSpace($npmSecret)) {
-        throw "NpmPublish plugin requires 'npmSecret' in scriptSettings.json (logical secret name, e.g. Npm)."
+    $npmCliVersion = [string](& npm --version)
+    if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($npmCliVersion)) {
+        throw "NpmPublish could not read the npm CLI version."
+    }
+    $npmCliVersion = $npmCliVersion.Trim()
+    if (([version]$npmCliVersion) -lt [version]'11.15.0') {
+        throw "NpmPublish requires npm CLI 11.15.0 or newer for 'npm stage publish' (installed: $npmCliVersion). Direct publish cannot defer 2FA."
     }
 
-    $npmToken = Get-SecretEnvironmentValue -Name $npmSecret
+    $npmToken = Get-RepoUtilsSecretSlot -Name $npmSecret -Settings $shared
     if ([string]::IsNullOrWhiteSpace($npmToken)) {
-        throw "npm API key is not set. Set environment variable '$npmSecret'."
+        throw "npm API key is not set. Set RepoUtilsSecrets slot '$npmSecret' (npmSecret)."
     }
 
     $registryHost = ([uri]$registry).Host
@@ -111,22 +127,29 @@ registry=$registry
         Set-Content -Path $tempNpmRcPath -Value $npmRcContent -Encoding UTF8 -NoNewline
 
         foreach ($packageName in $publishOrder) {
-            Write-Log -Level "STEP" -Message "Publishing npm package '$packageName'..."
+            Write-Log -Level "STEP" -Message "Staging npm package '$packageName' (approve later with 2FA)..."
+            $publishArgs = @('stage', 'publish')
             if ($useWorkspaces) {
-                npm publish -w $packageName --access $access --userconfig $tempNpmRcPath
+                $publishArgs += @('-w', $packageName)
             }
             else {
                 Assert-NpmRootPackageName -WorkspaceRoot $workspaceRoot -ExpectedPackageName $packageName
-                npm publish --access $access --userconfig $tempNpmRcPath
             }
+            $publishArgs += @('--access', $access, '--userconfig', $tempNpmRcPath)
+            if (-not [string]::IsNullOrWhiteSpace($npmDistTag)) {
+                $publishArgs += @('--tag', $npmDistTag)
+                Write-Log -Level "INFO" -Message "  Using npm dist-tag '$npmDistTag' (prerelease)."
+            }
+
+            npm @publishArgs
 
             if ($LASTEXITCODE -ne 0) {
-                throw "Failed to publish npm package '$packageName'."
+                throw "Failed to stage npm package '$packageName'."
             }
-            Write-Log -Level "OK" -Message "  Published $packageName."
+            Write-Log -Level "OK" -Message "  Staged $packageName. It is not installable until a maintainer runs 'npm stage approve' with 2FA."
         }
 
-        Write-Log -Level "OK" -Message "  npm publish completed."
+        Write-Log -Level "OK" -Message "  npm stage publish completed."
         Import-PluginDependency -ModuleName "EngineContext" -RequiredCommand "Add-EnginePublishCompletion"
         Add-EnginePublishCompletion -Context $shared -Publisher 'NpmPublish'
     }

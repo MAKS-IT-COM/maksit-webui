@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.6] - 2026-09-24
+
+### Fixed
+
+- `DataTable`: after a page change, the grid scroll position resets (top for next/buttons, bottom when scrolling into the previous page) so the scrollbar no longer stays parked on the old edge.
+- `ExternalLoginButtons`: each provider button is keyed, so React no longer warns about a missing key when several providers render.
+
+### Changed
+
+- RepoUtils: SemVer prerelease (`X.Y.Z-alpha.1` / `beta` / `rc`) in changelog parsing, version files, publish-guard tags (`v0.1.0-alpha.1`), GitHub `--prerelease`, and npm dist-tags (prerelease does not move `latest`).
+- RepoUtils: optional Vault secret loading. Release settings declare `RepoUtilsSecretsShared` / `RepoUtilsSecrets`; GitHub uses the `GitClone` slot and npm uses `Npm`. `NpmPublish` stages with `npm stage publish` (npm CLI 11.15+) so a maintainer approves the version with 2FA. Plugin success requires an exact `$true` (CLI stdout mixed into the return value no longer counts as success).
+- RepoUtils: dropped unused DotNet pack/publish/test plugins and CI Docker/npm pack templates. Added `CollectCoverage`, `ContainerEngineProbe`, and `DiscoverPackageArtifacts`.
+- README: release steps document prerelease tags and link to maksit-repoutils.
+- `src/package-lock.json` refreshed for npm 12, and `allowScripts` permits the `esbuild`, `msw`, and `unrs-resolver` install scripts that `npm ci` otherwise blocks.
+
 ## [0.4.5] - 2026-08-12
 
 ### Changed

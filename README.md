@@ -30,8 +30,8 @@ Tests and coverage badges (shields.io URLs in this README): **`utils\Invoke-Test
 
 ## Release to npmjs
 
-1. Set **`Npm`** environment variable to your npm automation token (logical secret name in `scriptSettings.json`).
-2. Bump **`src/package.json`** `version` (and tag `vX.Y.Z` on `main` when using the publish guard).
+1. Set **`RepoUtilsSecretsShared`** and **`RepoUtilsSecrets`** to JSON objects. Slots used here: **`Npm`** (npm automation token) and **`GitClone`** (GitHub token). The repo pack overrides the shared pack.
+2. Bump **`src/package.json`** `version` (and tag `v{version}` on `main` when using the publish guard — `v1.2.3` or SemVer prerelease such as `v0.1.0-alpha.1`). Prerelease versions publish with npm dist-tag `alpha`/`beta`/`rc` and do not move `latest`.
 3. Run **`utils\Invoke-ReleasePackage.bat`** (or `pwsh utils\engines\release\Invoke-ReleasePackage.ps1`).
 
 Configured plugins (see `utils\engines\release\scriptSettings.json`):
@@ -41,10 +41,10 @@ Configured plugins (see `utils\engines\release\scriptSettings.json`):
 | `NpmReleaseVersion` | Read semver from `src/package.json` |
 | `NpmBuild` | `npm ci` + `npm run build` |
 | `ReleasePublishGuard` | Branch/tag checks before publish |
-| `GitHub` | GitHub release (optional; set `GitHub` env var) |
-| `NpmPublish` | Publish `@maks-it.com/webui` |
+| `GitHub` | GitHub release (optional; `GitClone` slot in the secrets pack) |
+| `NpmPublish` | Stage `@maks-it.com/webui` (`npm stage publish`). A maintainer approves with 2FA (`npm stage approve`). Requires npm CLI 11.15 or newer. |
 
-Refresh shared utils from **maksit-repoutils** via local-copy sync (no Update-RepoUtils in product repos).
+Refresh shared utils from **[maksit-repoutils](https://git.maks-it.com/MAKS-IT/maksit-repoutils)** via local-copy sync (no Update-RepoUtils in product repos).
 
 ## Consume in product repos
 

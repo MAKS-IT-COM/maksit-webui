@@ -2,6 +2,8 @@
   "$schema": "https://json-schema.org/draft-07/schema",
   "title": "Release Package Script Settings",
   "description": "maksit-webui: npm workspace publish (@maks-it.com/webui). Semver from NpmReleaseVersion (src/package.json).",
+  "repoUtilsSecretsShared": "RepoUtilsSecretsShared",
+  "repoUtilsSecrets": "RepoUtilsSecrets",
   "plugins": [
     {
       "name": "NpmReleaseVersion",
@@ -46,7 +48,7 @@
       "name": "GitHub",
       "stageLabel": "release",
       "enabled": true,
-      "githubSecret": "GitHub",
+      "githubSecret": "GitClone",
       "repository": "https://github.com/MAKS-IT-COM/maksit-webui",
       "releaseNotesFile": "..\\..\\..\\CHANGELOG.md",
       "releaseTitlePattern": "Release {version}"

@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react'
+import { Fragment, type FC, type ReactNode } from 'react'
 import { LoginProviderExternal } from '@webui/contracts'
 
 export interface ExternalLoginProviderConfig {
@@ -45,14 +45,16 @@ const ExternalLoginButtons: FC<ExternalLoginButtonsProps> = ({
   renderButton = defaultRenderButton,
 }) => (
   <div className={className ?? 'flex flex-col gap-2'}>
-    {providers.map(({ provider, label, iconSrc }) =>
-      renderButton({
-        provider,
-        label,
-        iconSrc,
-        onClick: () => onSelect(provider),
-      }),
-    )}
+    {providers.map(({ provider, label, iconSrc }) => (
+      <Fragment key={provider}>
+        {renderButton({
+          provider,
+          label,
+          iconSrc,
+          onClick: () => onSelect(provider),
+        })}
+      </Fragment>
+    ))}
   </div>
 )
 

@@ -35,6 +35,7 @@ else {
 }
 
 $configuredPlugins = Get-ConfiguredPlugins -Settings $settings
+Initialize-RepoUtilsVaultSecrets -Settings $settings -Plugins $configuredPlugins
 
 $releaseBanner = if ($null -ne $releaseExtension) {
     $releaseExtension.StepBanner
@@ -81,7 +82,8 @@ else {
         }
 
         $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $sharedPluginSettings -EngineDirectory $PSScriptRoot
-        if (-not $pluginSucceeded) {
+        # Exact $true only: polluted arrays (CLI stdout + $false) are truthy under -not.
+        if ($pluginSucceeded -ne $true) {
             $releaseHadPluginFailures = $true
             break
         }

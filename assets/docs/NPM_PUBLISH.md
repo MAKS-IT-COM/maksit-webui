@@ -17,7 +17,7 @@ Published package:
 3. Create an **Automation** token (recommended) or Granular Access token with **Publish** on `@maks-it.com/*`:
    - https://www.npmjs.com/settings/maks-it.com/tokens
 4. Store the token for release tooling:
-   - **CI / release engine:** set environment variable **`Npm`** (logical secret name in `scriptSettings.json`).
+   - **CI / release engine:** set **`RepoUtilsSecretsShared`** and **`RepoUtilsSecrets`** to JSON objects. The **`Npm`** slot is the automation token; **`GitClone`** is the GitHub token. The repo pack overrides the shared pack.
    - **Local one-off publish:** `npm login` or a user-level `~/.npmrc` entry:
      ```
      //registry.npmjs.org/:_authToken=YOUR_TOKEN
@@ -48,7 +48,7 @@ Use **`utils\Invoke-ReleasePackage-Single.bat`** (or `pwsh utils\engines\release
 
 1. Bump version in `src/package.json` (or tag drives `NpmReleaseVersion`).
 2. Tag `HEAD` with exact semver, e.g. `git tag v0.4.0 && git push origin v0.4.0`.
-3. Set `$env:Npm` and run the release engine.
+3. Set `$env:RepoUtilsSecretsShared` and `$env:RepoUtilsSecrets` (JSON packs with `Npm` and `GitClone`) and run the release engine. `NpmPublish` runs `npm stage publish` (npm CLI 11.15+). Approve the staged version with 2FA: `npm stage list @maks-it.com/webui`, then `npm stage approve <stage-id>`.
 
 `utils\engines\release\scriptSettings.json` runs `NpmReleaseVersion`, `NpmBuild`, `ReleasePublishGuard`, optional `GitHub`, then `NpmPublish`.
 

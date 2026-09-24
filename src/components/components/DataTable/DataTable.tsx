@@ -4,6 +4,7 @@ import { AutoSizer, MultiGrid, GridCellProps } from 'react-virtualized'
 import { mapPagedToDataTable, type DataTablePageView, type PagedResponse } from '@webui/core'
 import { Plus, Trash2, Edit } from 'lucide-react'
 import { debounce, colSpanClass, type GridColSpan } from '../../functions'
+import { dataTableScrollEdge, forcedScrollTopFor, SCROLL_EDGE_PX, type DataTableScrollReset } from './dataTableScroll'
 
 
 interface FilterProps {
@@ -90,6 +91,10 @@ const DataTable = <T extends Record<string, unknown>,>(props: DataTableProps<T>)
 
   const gridRef = useRef<MultiGrid>(null)
   const filterMeasureRef = useRef<HTMLDivElement>(null)
+  const pendingReset = useRef<DataTableScrollReset | null>(null)
+  const suppressEdge = useRef(false)
+  const scrollTopRef = useRef(0)
+  const [forcedScrollTop, setForcedScrollTop] = useState<number | undefined>(undefined)
 
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null)
   const [measuredFilterRowHeight, setMeasuredFilterRowHeight] = useState(0)
@@ -214,8 +219,35 @@ const DataTable = <T extends Record<string, unknown>,>(props: DataTableProps<T>)
     debouncedOnFilterChange?.(linqQueries)
   }
 
-  const handlePreviousPage = () => onPreviousPage?.(pageNumber - 1)
-  const handleNextPage = () => onNextPage?.(pageNumber + 1)
+  const handlePreviousPage = () => {
+    if (pendingReset.current)
+      return
+
+    pendingReset.current = 'top'
+    onPreviousPage?.(pageNumber - 1)
+  }
+
+  const handleNextPage = () => {
+    if (pendingReset.current)
+      return
+
+    pendingReset.current = 'top'
+    onNextPage?.(pageNumber + 1)
+  }
+
+  useEffect(() => {
+    const target = pendingReset.current
+    if (!target)
+      return
+
+    pendingReset.current = null
+
+    if (target === 'top' && scrollTopRef.current <= SCROLL_EDGE_PX)
+      return
+
+    suppressEdge.current = true
+    setForcedScrollTop(forcedScrollTopFor(target))
+  }, [pageNumber, items])
 
 
   const getRealIdsFromRow = (rowIndex: number) => {
@@ -423,12 +455,32 @@ const DataTable = <T extends Record<string, unknown>,>(props: DataTableProps<T>)
     clientHeight: number
     scrollHeight: number
   }) => {
-    if (scrollTop + clientHeight >= scrollHeight - 2 && hasNextPage) {
-      handleNextPage()
+    scrollTopRef.current = scrollTop
+
+    if (suppressEdge.current) {
+      suppressEdge.current = false
+      setForcedScrollTop(undefined)
+      return
     }
-    if (scrollTop <= 2 && hasPreviousPage) {
-      handlePreviousPage()
-    }
+
+    const edge = dataTableScrollEdge({
+      scrollTop,
+      clientHeight,
+      scrollHeight,
+      hasNextPage,
+      hasPreviousPage,
+      pendingReset: pendingReset.current !== null,
+    })
+
+    if (edge.type === 'none')
+      return
+
+    pendingReset.current = edge.reset
+
+    if (edge.type === 'next')
+      onNextPage?.(pageNumber + 1)
+    else
+      onPreviousPage?.(pageNumber - 1)
   }
 
   return (
@@ -463,6 +515,7 @@ const DataTable = <T extends Record<string, unknown>,>(props: DataTableProps<T>)
               rowCount={items.length + HEADER_ROWS}
               rowHeight={({ index }) => index === 1 ? measuredFilterRowHeight : ROW_HEIGHT}
               width={width}
+              {...(forcedScrollTop !== undefined ? { scrollTop: forcedScrollTop } : {})}
               onScroll={({ scrollTop, clientHeight, scrollHeight }) =>
                 handleGridScroll({ scrollTop, clientHeight, scrollHeight })
               }

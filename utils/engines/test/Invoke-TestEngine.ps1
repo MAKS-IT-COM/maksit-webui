@@ -32,7 +32,8 @@ $testHadPluginFailures = $false
 
 foreach ($plugin in $configuredPlugins) {
     $pluginSucceeded = Invoke-ConfiguredPlugin -Plugin $plugin -SharedSettings $engineContext -EngineDirectory $scriptDir
-    if (-not $pluginSucceeded) {
+    # Exact $true only: polluted arrays (CLI stdout + $false) are truthy under -not.
+    if ($pluginSucceeded -ne $true) {
         $testHadPluginFailures = $true
         break
     }
